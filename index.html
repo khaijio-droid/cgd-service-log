@@ -188,6 +188,26 @@ tbody tr:last-child td{border-bottom:none}
   .bar-lbl{width:130px}
 }
 
+/* ── SYNC BAR ── */
+.sync-bar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:7px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  position:sticky;top:120px;z-index:98;box-shadow:0 1px 4px rgba(0,0,0,.04);
+  font-size:.82rem;
+}
+.sync-info{display:flex;align-items:center;gap:8px;color:#6b7280;flex:1}
+.btn-sync{
+  padding:6px 16px;border:none;border-radius:20px;cursor:pointer;
+  font-size:.82rem;font-weight:700;
+  background:linear-gradient(135deg,#1a56db,#3b82f6);color:#fff;
+  transition:opacity .2s,transform .15s;display:flex;align-items:center;gap:6px;
+}
+.btn-sync:hover{opacity:.85;transform:translateY(-1px)}
+.btn-sync:disabled{background:#9ca3af;cursor:default;transform:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.spinning{display:inline-block;animation:spin .8s linear infinite}
+
 /* ── PRINT ── */
 @media print{
   header,.tab-bar,.toolbar,.rpt-nav,.period-nav,.btn-submit,
@@ -220,6 +240,20 @@ tbody tr:last-child td{border-bottom:none}
   <button class="tab-btn"        data-tab="settings"onclick="showTab(this,'settings')">⚙️ ตั้งค่า</button>
 </div>
 
+<!-- ══ SYNC BAR ══ -->
+<div class="sync-bar" id="sync-bar">
+  <div class="sync-info">
+    <span id="sync-badge" class="sync-badge sb-off">
+      <span class="dot dot-gr"></span> ออฟไลน์
+    </span>
+    <span id="sync-last-lbl">ยังไม่เคย Sync</span>
+    <span id="sync-count-lbl" style="color:var(--primary);font-weight:600"></span>
+  </div>
+  <button class="btn-sync" id="sync-btn" onclick="manualSync()" title="ดึงข้อมูลจากทุกเครื่องมารวมกัน">
+    🔄 Sync ข้อมูล
+  </button>
+</div>
+
 <!-- ══ TAB 1: FORM ══ -->
 <div class="tab-pane active" id="tab-form">
   <div class="form-card">
@@ -235,7 +269,7 @@ tbody tr:last-child td{border-bottom:none}
 
         <!-- คิวบริการ -->
         <div class="form-group">
-          <label>คิวบริการ (ประเภท + หมายเลข)</label>
+          <label>คิวบริการ (ประเภท + หมายเลข)<span class="req">*</span></label>
           <div class="queue-row">
             <select id="f-qtype" onchange="onQueueTypeChange()" style="min-width:0;flex:2">
               <option value="">-- ประเภทบริการ --</option>
@@ -252,7 +286,7 @@ tbody tr:last-child td{border-bottom:none}
 
         <!-- เวลาสิ้นสุด -->
         <div class="form-group">
-          <label>เวลาสิ้นสุด</label>
+          <label>เวลาสิ้นสุด<span class="req">*</span></label>
           <input type="time" id="f-tend" onchange="calcDur()"/>
         </div>
 
@@ -270,7 +304,7 @@ tbody tr:last-child td{border-bottom:none}
 
         <!-- หน่วยงาน -->
         <div class="form-group">
-          <label>หน่วยงาน / ประชาชนทั่วไป</label>
+          <label>หน่วยงาน / ประชาชนทั่วไป<span class="req">*</span></label>
           <input type="text" id="f-agency" placeholder="ชื่อหน่วยงาน หรือ ประชาชน"/>
         </div>
 
@@ -300,7 +334,7 @@ tbody tr:last-child td{border-bottom:none}
 
         <!-- คำตอบ (full width) -->
         <div class="form-group full">
-          <label>คำตอบการให้บริการ / การให้คำปรึกษา</label>
+          <label>คำตอบการให้บริการ / การให้คำปรึกษา<span class="req">*</span></label>
           <textarea id="f-answer" placeholder="ระบุคำตอบ/แนวทางที่แนะนำ..." rows="3"></textarea>
         </div>
 
@@ -314,11 +348,12 @@ tbody tr:last-child td{border-bottom:none}
 <div class="tab-pane" id="tab-records">
   <div class="toolbar">
     <input type="text" class="srch" id="srch" placeholder="🔍 ค้นหา ชื่อ / หน่วยงาน / คำถาม..." oninput="renderRecords()"/>
-    <select id="flt-date" onchange="renderRecords()" style="width:auto">
+    <select id="flt-date" onchange="toggleRecDateRange();renderRecords()" style="width:auto">
       <option value="">ทุกวัน</option>
       <option value="today">วันนี้</option>
       <option value="week">สัปดาห์นี้</option>
       <option value="month">เดือนนี้</option>
+      <option value="custom">📅 ช่วงวันที่ระบุ</option>
     </select>
     <select id="flt-svc" onchange="renderRecords()" style="width:auto">
       <option value="">ทุกประเภทบริการ</option>
@@ -326,8 +361,19 @@ tbody tr:last-child td{border-bottom:none}
     <select id="flt-ch" onchange="renderRecords()" style="width:auto">
       <option value="">ทุกช่องทาง</option>
     </select>
+    <select id="flt-officer" onchange="renderRecords()" style="width:auto">
+      <option value="">ทุกเจ้าหน้าที่</option>
+    </select>
     <button class="btn btn-green" onclick="exportCSV()">📥 Export CSV</button>
     <button class="btn btn-blue"  onclick="window.print()">🖨️ พิมพ์</button>
+  </div>
+  <!-- ช่วงวันที่ระบุ (แสดงเมื่อเลือก custom) -->
+  <div id="rec-date-range" style="display:none;padding:10px 0 4px;display:none;align-items:center;gap:10px;flex-wrap:wrap">
+    <label style="font-size:.86rem;font-weight:600;color:var(--gray)">ตั้งแต่วันที่</label>
+    <input type="date" id="rec-from" onchange="renderRecords()" style="width:auto;padding:7px 12px;font-size:.88rem"/>
+    <label style="font-size:.86rem;font-weight:600;color:var(--gray)">ถึงวันที่</label>
+    <input type="date" id="rec-to" onchange="renderRecords()" style="width:auto;padding:7px 12px;font-size:.88rem"/>
+    <span id="rec-count-lbl" style="font-size:.84rem;color:var(--primary);font-weight:600"></span>
   </div>
   <div class="tbl-wrap">
     <table>
@@ -348,14 +394,28 @@ tbody tr:last-child td{border-bottom:none}
     <button class="rpt-btn active" onclick="setRptType('daily',this)">📅 รายวัน</button>
     <button class="rpt-btn"        onclick="setRptType('weekly',this)">📆 รายสัปดาห์</button>
     <button class="rpt-btn"        onclick="setRptType('monthly',this)">🗓️ รายเดือน</button>
+    <button class="rpt-btn"        onclick="setRptType('custom',this)">🗂️ ช่วงวันที่ระบุ</button>
   </div>
-  <div class="period-nav">
+
+  <!-- ปุ่มนำทาง (ซ่อนเมื่อเลือก custom) -->
+  <div class="period-nav" id="rpt-period-nav">
     <button class="btn btn-blue" onclick="rptNav(-1)">◀ ก่อนหน้า</button>
     <span class="period-lbl" id="rpt-lbl">—</span>
     <button class="btn btn-blue" onclick="rptNav(1)">ถัดไป ▶</button>
     <button class="btn btn-gray" onclick="rptToday()">วันนี้/ปัจจุบัน</button>
     <button class="btn btn-green" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
   </div>
+
+  <!-- ช่วงวันที่ระบุเอง (แสดงเมื่อเลือก custom) -->
+  <div id="rpt-custom-range" style="display:none" class="period-nav">
+    <label style="font-size:.88rem;font-weight:600">ตั้งแต่วันที่</label>
+    <input type="date" id="rpt-from" onchange="renderReport()" style="width:auto;padding:7px 12px;font-size:.88rem;border:1.5px solid var(--border);border-radius:8px"/>
+    <label style="font-size:.88rem;font-weight:600">ถึงวันที่</label>
+    <input type="date" id="rpt-to" onchange="renderReport()" style="width:auto;padding:7px 12px;font-size:.88rem;border:1.5px solid var(--border);border-radius:8px"/>
+    <button class="btn btn-gray" onclick="setRptCustomToday()">เดือนนี้</button>
+    <button class="btn btn-green" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
+  </div>
+
   <div id="rpt-content"></div>
 </div>
 
@@ -364,12 +424,17 @@ tbody tr:last-child td{border-bottom:none}
 
   <!-- สถานะ -->
   <div class="set-card">
-    <div class="set-ttl">🔄 สถานะการเชื่อมต่อ</div>
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <span id="sync-badge" class="sync-badge sb-off">
+    <div class="set-ttl">🔄 สถานะการเชื่อมต่อ Cloud</div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+      <span id="sync-badge-settings" class="sync-badge sb-off">
         <span class="dot dot-gr"></span> ออฟไลน์ (Local Storage)
       </span>
-      <span style="font-size:.82rem;color:#6b7280">ข้อมูลเก็บในเครื่องนี้เท่านั้น</span>
+    </div>
+    <div class="info-box" style="background:#d1fae5;border-color:#6ee7b7;color:#065f46;margin-bottom:0">
+      💡 <strong>หลักการทำงาน:</strong> เมื่อตั้งค่า Google Sheets URL แล้ว<br/>
+      • ทุกครั้งที่ <strong>บันทึกข้อมูล</strong> → ส่งขึ้น Cloud ทันที<br/>
+      • ทุกครั้งที่ <strong>เปิดแอป</strong> → ดึงข้อมูลจาก Cloud มารวมอัตโนมัติ<br/>
+      • กดปุ่ม <strong>🔄 Sync</strong> บนแถบด้านบนได้ตลอดเวลา
     </div>
   </div>
 
@@ -433,6 +498,29 @@ tbody tr:last-child td{border-bottom:none}
     <button class="btn btn-blue" onclick="saveConfig()" style="margin-top:12px">บันทึกข้อมูล</button>
   </div>
 
+  <!-- เปลี่ยนรหัสผ่านผู้ดูแล -->
+  <div class="set-card">
+    <div class="set-ttl">🔑 รหัสผ่านผู้ดูแลระบบ</div>
+    <div class="info-box" style="margin-bottom:14px">
+      รหัสผ่านใช้สำหรับล็อคการเข้าถึงหน้าตั้งค่า เจ้าหน้าที่ทั่วไปจะไม่สามารถแก้ไขการตั้งค่าได้
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>รหัสผ่านปัจจุบัน</label>
+        <input type="password" id="old-pin" placeholder="••••••••"/>
+      </div>
+      <div class="form-group">
+        <label>รหัสผ่านใหม่</label>
+        <input type="password" id="new-pin" placeholder="อย่างน้อย 4 ตัวอักษร"/>
+      </div>
+      <div class="form-group">
+        <label>ยืนยันรหัสผ่านใหม่</label>
+        <input type="password" id="confirm-pin" placeholder="••••••••"/>
+      </div>
+    </div>
+    <button class="btn btn-red" onclick="changePin()" style="margin-top:12px">🔑 เปลี่ยนรหัสผ่าน</button>
+  </div>
+
   <!-- จัดการข้อมูล -->
   <div class="set-card">
     <div class="set-ttl">💾 จัดการข้อมูล</div>
@@ -461,6 +549,81 @@ tbody tr:last-child td{border-bottom:none}
     <div class="modal-act">
       <button class="btn btn-gray" onclick="closeModal()">ปิด</button>
     </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN LOGIN MODAL ══ -->
+<div class="modal-ov hidden" id="admin-modal">
+  <div class="modal-box" style="max-width:380px;border-top:6px solid #b91c1c">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:2.4rem;margin-bottom:8px">🔐</div>
+      <div style="font-size:1.05rem;font-weight:800;color:#b91c1c">ผู้ดูแลระบบเท่านั้น</div>
+      <div style="font-size:.84rem;color:#6b7280;margin-top:6px">กรุณาใส่รหัสผ่านเพื่อเข้าถึงการตั้งค่า</div>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>รหัสผ่านผู้ดูแล</label>
+      <input type="password" id="admin-pin-input" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') checkAdminPin()"
+        style="font-size:1.1rem;letter-spacing:4px;text-align:center"/>
+      <div id="admin-pin-err" style="color:#dc2626;font-size:.82rem;margin-top:6px;display:none">
+        ❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่
+      </div>
+    </div>
+    <button onclick="checkAdminPin()" class="btn-submit" style="margin-top:0;background:linear-gradient(135deg,#b91c1c,#ef4444)">
+      🔓 เข้าสู่ระบบ
+    </button>
+    <button onclick="closeAdminModal()" class="btn btn-gray" style="width:100%;margin-top:10px">
+      ยกเลิก
+    </button>
+    <div style="text-align:center;margin-top:14px;font-size:.78rem;color:#9ca3af">
+      รหัสเริ่มต้น: <strong>cgd2568</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ข้อควรรู้ก่อนใช้ MODAL ══ -->
+<div class="modal-ov" id="notice-modal">
+  <div class="modal-box" style="max-width:580px;border-top:6px solid var(--primary-mid)">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:2.6rem;margin-bottom:8px">🏛️</div>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--primary)">สำนักงานคลังจังหวัดอำนาจเจริญ</div>
+      <div style="font-size:.85rem;color:#6b7280;margin-top:4px">ระบบบันทึกการให้บริการ / ให้คำปรึกษา · กรมบัญชีกลาง</div>
+    </div>
+
+    <div style="background:var(--amber-lt);border:1.5px solid #fbbf24;border-radius:10px;padding:16px;margin-bottom:16px">
+      <div style="font-weight:700;color:var(--amber);margin-bottom:8px;font-size:.95rem">⚠️ ข้อควรรู้ก่อนใช้งาน</div>
+      <ul style="padding-left:18px;font-size:.87rem;color:#78350f;line-height:2;margin:0">
+        <li>ระบบนี้ใช้สำหรับ <strong>บันทึกการให้บริการและให้คำปรึกษา</strong> แก่ผู้รับบริการเท่านั้น</li>
+        <li>กรุณากรอกข้อมูล <strong>ให้ครบถ้วนทุกช่อง</strong> เพื่อประโยชน์ในการจัดทำรายงาน</li>
+        <li>ข้อมูลจะถูกบันทึกไว้ใน <strong>เครื่องที่ใช้งาน</strong> (Local Storage)</li>
+        <li>หากต้องการใช้งานร่วมกันหลายเครื่อง ให้ตั้งค่า Google Sheets ในแท็บ <strong>⚙️ ตั้งค่า</strong></li>
+        <li><strong>ห้ามบันทึกข้อมูลส่วนบุคคลที่ละเอียดอ่อน</strong> เช่น เลขบัตรประชาชน หมายเลขบัญชี</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--primary-lt);border:1.5px solid #93c5fd;border-radius:10px;padding:14px;margin-bottom:18px">
+      <div style="font-weight:700;color:var(--primary);margin-bottom:6px;font-size:.9rem">📋 ช่องที่ต้องกรอกทุกครั้ง</div>
+      <div style="font-size:.85rem;color:#1e40af;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;line-height:1.8">
+        <span>✅ วันที่</span>
+        <span>✅ เวลาเริ่มต้น – สิ้นสุด</span>
+        <span>✅ คิวบริการ</span>
+        <span>✅ ชื่อผู้รับบริการ</span>
+        <span>✅ หน่วยงาน/ประชาชน</span>
+        <span>✅ ช่องทางการให้บริการ</span>
+        <span>✅ คำถาม/เรื่องที่ขอ</span>
+        <span>✅ คำตอบ/คำปรึกษา</span>
+        <span>✅ เจ้าหน้าที่ผู้ให้บริการ</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <input type="checkbox" id="notice-noshowcheck" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary-mid)"/>
+      <label for="notice-noshowcheck" style="font-size:.85rem;cursor:pointer;color:#6b7280">ไม่แสดงอีกในเครื่องนี้</label>
+    </div>
+
+    <button onclick="closeNotice()" class="btn-submit" style="margin-top:0">
+      ✅ รับทราบ — เริ่มใช้งาน
+    </button>
   </div>
 </div>
 
@@ -659,16 +822,26 @@ function submitForm(e) {
   const vQuestion = document.getElementById('f-question').value.trim();
   const vChannel  = document.getElementById('f-channel').value;
 
-  if(!vDate)     { highlight('f-date');     toast('⚠️ กรุณาระบุวันที่'); return; }
-  if(!vTStart)   { highlight('f-tstart');   toast('⚠️ กรุณาระบุเวลาเริ่มต้น'); return; }
-  if(!vName)     { highlight('f-name');     toast('⚠️ กรุณาระบุชื่อผู้รับบริการ'); return; }
-  if(!vOfficer)  { highlight('f-officer');  toast('⚠️ กรุณาเลือกเจ้าหน้าที่ผู้ให้บริการ'); return; }
-  if(!vChannel)  { document.getElementById('ch-grid').scrollIntoView({behavior:'smooth',block:'center'});
-                   toast('⚠️ กรุณาเลือกช่องทางการให้บริการ'); return; }
-  if(!vQuestion) { highlight('f-question'); toast('⚠️ กรุณาระบุคำถาม/เรื่องที่ขอรับบริการ'); return; }
+  const vQType   = document.getElementById('f-qtype').value;
+  const vQNum    = document.getElementById('f-qnum').value.trim();
+  const vTEnd    = document.getElementById('f-tend').value;
+  const vAgency  = document.getElementById('f-agency').value.trim();
+  const vAnswer  = document.getElementById('f-answer').value.trim();
 
-  const qType = document.getElementById('f-qtype').value;
-  const qNum  = document.getElementById('f-qnum').value.trim();
+  if(!vDate)    { highlight('f-date');     toast('⚠️ กรุณาระบุวันที่'); return; }
+  if(!vTStart)  { highlight('f-tstart');   toast('⚠️ กรุณาระบุเวลาเริ่มต้น'); return; }
+  if(!vTEnd)    { highlight('f-tend');     toast('⚠️ กรุณาระบุเวลาสิ้นสุด'); return; }
+  if(!vQType)   { highlight('f-qtype');    toast('⚠️ กรุณาเลือกประเภทคิวบริการ'); return; }
+  if(!vQNum)    { highlight('f-qnum');     toast('⚠️ กรุณาระบุหมายเลขคิว'); return; }
+  if(!vName)    { highlight('f-name');     toast('⚠️ กรุณาระบุชื่อผู้รับบริการ'); return; }
+  if(!vAgency)  { highlight('f-agency');   toast('⚠️ กรุณาระบุหน่วยงาน หรือ ประชาชน'); return; }
+  if(!vOfficer) { highlight('f-officer');  toast('⚠️ กรุณาเลือกเจ้าหน้าที่ผู้ให้บริการ'); return; }
+  if(!vChannel) { document.getElementById('ch-grid').scrollIntoView({behavior:'smooth',block:'center'});
+                  toast('⚠️ กรุณาเลือกช่องทางการให้บริการ'); return; }
+  if(!vQuestion){ highlight('f-question'); toast('⚠️ กรุณาระบุคำถาม/เรื่องที่ขอรับบริการ'); return; }
+  if(!vAnswer)  { highlight('f-answer');   toast('⚠️ กรุณาระบุคำตอบ/คำปรึกษา'); return; }
+
+  const qNum  = vQNum;
   const svc   = SERVICES.find(s => s.id === qType);
   const qStr  = svc
     ? svc.prefix + (qNum || '')
@@ -754,26 +927,38 @@ function calcMins(s, e) {
    RECORDS TAB
 ══════════════════════════════════════════════ */
 function renderRecords() {
-  const q    = document.getElementById('srch').value.toLowerCase();
-  const fd   = document.getElementById('flt-date').value;
-  const fsvc = document.getElementById('flt-svc').value;
-  const fch  = document.getElementById('flt-ch').value;
+  const q       = document.getElementById('srch').value.toLowerCase();
+  const fd      = document.getElementById('flt-date').value;
+  const fsvc    = document.getElementById('flt-svc').value;
+  const fch     = document.getElementById('flt-ch').value;
+  const fofficer= document.getElementById('flt-officer')?.value || '';
+  const frFrom  = document.getElementById('rec-from').value;
+  const frTo    = document.getElementById('rec-to').value;
 
   let list = records.filter(r => {
     if(fd === 'today' && r.date !== isoDate(new Date())) return false;
-    if(fd === 'week')  { const w = weekStart(new Date()); if(new Date(r.date) < w) return false; }
+    if(fd === 'week')  { const w=weekStart(new Date()); if(new Date(r.date)<w) return false; }
     if(fd === 'month') {
       const n=new Date(), d=new Date(r.date);
       if(d.getFullYear()!==n.getFullYear()||d.getMonth()!==n.getMonth()) return false;
     }
-    if(fsvc && r.qType !== fsvc) return false;
-    if(fch  && r.channel !== fch)  return false;
+    if(fd === 'custom') {
+      if(frFrom && r.date < frFrom) return false;
+      if(frTo   && r.date > frTo)   return false;
+    }
+    if(fsvc    && r.qType   !== fsvc)    return false;
+    if(fch     && r.channel !== fch)     return false;
+    if(fofficer&& r.officer !== fofficer)return false;
     if(q) {
       const hay=[r.name,r.agency,r.question,r.answer,r.officer,r.queue].join(' ').toLowerCase();
       if(!hay.includes(q)) return false;
     }
     return true;
   }).sort((a,b) => b.id.localeCompare(a.id));
+
+  // แสดงจำนวนที่กรองได้
+  const cnt = document.getElementById('rec-count-lbl');
+  if(cnt) cnt.textContent = `พบ ${list.length} รายการ`;
 
   const tbody = document.getElementById('rec-tbody');
   if(!list.length) {
@@ -858,6 +1043,11 @@ function setRptType(t, btn) {
   rptType = t; rptOff = 0;
   document.querySelectorAll('.rpt-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // แสดง/ซ่อน UI ตามประเภท
+  const isCustom = t === 'custom';
+  document.getElementById('rpt-period-nav').style.display  = isCustom ? 'none' : 'flex';
+  document.getElementById('rpt-custom-range').style.display= isCustom ? 'flex' : 'none';
+  if(isCustom && !document.getElementById('rpt-from').value) setRptCustomToday();
   renderReport();
 }
 
@@ -868,6 +1058,17 @@ function renderReport() {
   const now = new Date();
   let list = [], lbl = '';
 
+  if(rptType === 'custom') {
+    const frFrom = document.getElementById('rpt-from').value;
+    const frTo   = document.getElementById('rpt-to').value;
+    lbl = `🗂️ ${frFrom ? dateTH(frFrom) : '—'} ถึง ${frTo ? dateTH(frTo) : '—'}`;
+    list = records.filter(r => {
+      if(frFrom && r.date < frFrom) return false;
+      if(frTo   && r.date > frTo)   return false;
+      return true;
+    });
+    document.getElementById('rpt-lbl').textContent = lbl;
+  }
   if(rptType === 'daily') {
     const t = new Date(now); t.setDate(t.getDate()+rptOff);
     const ds = isoDate(t);
@@ -890,7 +1091,7 @@ function renderReport() {
     });
   }
 
-  document.getElementById('rpt-lbl').textContent = lbl;
+  if(rptType !== 'custom') document.getElementById('rpt-lbl').textContent = lbl;
 
   const total   = list.length;
   const totDur  = list.reduce((s,r)=>s+(r.duration||0), 0);
@@ -1133,47 +1334,131 @@ function updateCounts() {
 }
 
 /* ══════════════════════════════════════════════
-   GOOGLE APPS SCRIPT
+   GOOGLE APPS SCRIPT — SYNC ENGINE
 ══════════════════════════════════════════════ */
 function saveGasUrl() {
   gasUrl = document.getElementById('gas-url-in').value.trim();
   localStorage.setItem('cgd_gas_url', gasUrl);
   updateSyncBadge();
-  toast(gasUrl ? '✅ บันทึก URL Google Sheets แล้ว' : '🔌 ยกเลิกการเชื่อมต่อ Cloud');
+  if(gasUrl) { syncFromGAS(); }
+  toast(gasUrl ? '✅ บันทึก URL แล้ว กำลัง Sync...' : '🔌 ยกเลิกการเชื่อมต่อ Cloud');
 }
 
 async function testGas() {
   const url = document.getElementById('gas-url-in').value.trim();
   if(!url) { toast('⚠️ กรุณาใส่ URL ก่อน'); return; }
-  toast('🔄 กำลังทดสอบการเชื่อมต่อ...');
+  setSyncState('testing');
   try {
-    await fetch(url+'?action=ping',{mode:'no-cors'});
-    toast('✅ เชื่อมต่อได้ (no-cors mode)');
+    const r = await fetch(url+'?action=ping', {redirect:'follow'});
+    const j = await r.json();
+    toast(j.status==='ok' ? '✅ เชื่อมต่อ Google Sheets ได้!' : '⚠️ ตอบกลับแต่สถานะผิดปกติ');
+    setSyncState('idle');
   } catch(err) {
     toast('❌ เชื่อมต่อไม่ได้: '+err.message);
+    setSyncState('error');
   }
 }
 
+/* บันทึก 1 record ขึ้น GAS (no-cors, fire-and-forget) */
 async function postGas(rec) {
   if(!gasUrl) return;
   try {
-    await fetch(gasUrl,{
-      method:'POST',mode:'no-cors',
+    await fetch(gasUrl, {
+      method:'POST', mode:'no-cors',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'addRecord',...rec}),
+      body:JSON.stringify({action:'addRecord', ...rec}),
     });
-  } catch(err) { console.warn('GAS sync error:',err); }
+  } catch(err) { console.warn('GAS post error:', err); }
+}
+
+/* ดึงข้อมูลทั้งหมดจาก GAS มารวมกับ local */
+async function syncFromGAS() {
+  if(!gasUrl) return;
+  setSyncState('syncing');
+  try {
+    const resp = await fetch(gasUrl+'?action=getAll', {redirect:'follow'});
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const data = await resp.json();
+
+    if(data.records && Array.isArray(data.records)) {
+      // Merge: ใช้ ID เป็น key ข้อมูล cloud ทับ local ถ้า id ซ้ำกัน
+      const merged = {};
+      records.forEach(r => { if(r.id) merged[r.id] = r; });
+      data.records.forEach(r => { if(r.id) merged[r.id] = r; });
+      records = Object.values(merged).sort((a,b)=>b.id.localeCompare(a.id));
+      saveRecs();
+      renderRecords();
+      renderReport();
+    }
+
+    const now = new Date().toISOString();
+    localStorage.setItem('cgd_last_sync', now);
+    setSyncState('ok');
+    updateSyncBadge();
+  } catch(err) {
+    console.warn('Sync error:', err);
+    setSyncState('error');
+    toast('⚠️ Sync ไม่สำเร็จ: '+err.message);
+  }
+}
+
+/* Sync ด้วยตนเอง (กดปุ่ม) */
+function manualSync() {
+  if(!gasUrl) {
+    toast('⚠️ ยังไม่ได้ตั้งค่า Google Sheets URL — ไปที่ ⚙️ ตั้งค่า');
+    document.querySelector('[data-tab="settings"]').click();
+    return;
+  }
+  syncFromGAS().then(() => toast('✅ Sync เสร็จสิ้น — ข้อมูลเป็นปัจจุบันแล้ว'));
+}
+
+/* สถานะปุ่ม sync */
+function setSyncState(state) {
+  const btn = document.getElementById('sync-btn');
+  const lbl = document.getElementById('sync-last-lbl');
+  const cnt = document.getElementById('sync-count-lbl');
+  const lastSync = localStorage.getItem('cgd_last_sync');
+
+  if(state === 'syncing' || state === 'testing') {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinning">🔄</span> กำลัง Sync...';
+    lbl.textContent = 'กำลังดึงข้อมูลจาก Cloud...';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = '🔄 Sync ข้อมูล';
+    if(lastSync) {
+      const d = new Date(lastSync);
+      lbl.textContent = 'Sync ล่าสุด: ' + dateTH(isoDate(d)) + ' ' + hhmm(d);
+    } else {
+      lbl.textContent = gasUrl ? 'กด Sync เพื่อดึงข้อมูล' : 'ยังไม่ได้ตั้งค่า Cloud';
+    }
+    cnt.textContent = records.length ? `(${records.length} รายการ)` : '';
+  }
+
+  if(state === 'error') {
+    lbl.textContent = '❌ Sync ล้มเหลว — ตรวจสอบการเชื่อมต่อ';
+  }
 }
 
 function updateSyncBadge() {
-  const b = document.getElementById('sync-badge');
-  if(gasUrl) {
-    b.className='sync-badge sb-on';
-    b.innerHTML='<span class="dot dot-g"></span> เชื่อมต่อ Google Sheets';
+  const lastSync = localStorage.getItem('cgd_last_sync');
+  let cls, html;
+  if(gasUrl && lastSync) {
+    cls  = 'sync-badge sb-on';
+    html = '<span class="dot dot-g"></span> Cloud (Google Sheets)';
+  } else if(gasUrl) {
+    cls  = 'sync-badge sb-on';
+    html = '<span class="dot dot-g"></span> Cloud (ยังไม่ได้ Sync)';
   } else {
-    b.className='sync-badge sb-off';
-    b.innerHTML='<span class="dot dot-gr"></span> ออฟไลน์ (Local Storage)';
+    cls  = 'sync-badge sb-off';
+    html = '<span class="dot dot-gr"></span> Local เท่านั้น';
   }
+  // อัปเดตทั้ง sync bar และ settings
+  const b1 = document.getElementById('sync-badge');
+  const b2 = document.getElementById('sync-badge-settings');
+  if(b1){ b1.className=cls; b1.innerHTML=html; }
+  if(b2){ b2.className=cls; b2.innerHTML=html; }
+  setSyncState('idle');
 }
 
 function copyGasCode() {
@@ -1183,19 +1468,25 @@ function copyGasCode() {
 }
 
 function gasCode() {
-return `// ===================================================
-// Google Apps Script — ระบบบันทึกการให้บริการ CGD
-// สำนักงานคลังจังหวัด · กรมบัญชีกลาง
-// วางโค้ดนี้ใน Extensions → Apps Script
-// Deploy → New Deployment → Web App
-// Execute as: Me | Who has access: Anyone
-// ===================================================
+return `// =====================================================
+// Google Apps Script — ระบบบันทึกการให้บริการ
+// สำนักงานคลังจังหวัดอำนาจเจริญ · กรมบัญชีกลาง
+// =====================================================
+// วิธีติดตั้ง:
+//   1. Extensions → Apps Script → วางโค้ดนี้ทั้งหมด
+//   2. Deploy → New Deployment → Web App
+//   3. Execute as: Me
+//   4. Who has access: Anyone
+//   5. กด Deploy → คัดลอก URL ไปใส่ในแอป
+// =====================================================
 
 const SHEET_NAME = 'ServiceLog';
-const HEADERS = [
-  'ID','วันที่','คิว','ประเภทบริการ','เวลาเริ่มต้น','เวลาสิ้นสุด',
-  'ระยะเวลา(นาที)','ชื่อผู้รับบริการ','หน่วยงาน','ช่องทาง',
-  'คำถาม','คำตอบ','เจ้าหน้าที่','บันทึกเมื่อ'
+
+// คอลัมน์ที่เก็บใน Sheet (ต้องตรงกับ field ในแอป)
+const FIELDS = [
+  'id','date','queue','qType','tStart','tEnd','duration',
+  'name','agency','channel','channelOther',
+  'question','answer','officer','ts'
 ];
 
 function getOrCreateSheet() {
@@ -1203,45 +1494,73 @@ function getOrCreateSheet() {
   let sh = ss.getSheetByName(SHEET_NAME);
   if (!sh) {
     sh = ss.insertSheet(SHEET_NAME);
-    sh.appendRow(HEADERS);
-    sh.getRange(1,1,1,HEADERS.length)
-      .setBackground('#1e3a8a').setFontColor('#ffffff')
-      .setFontWeight('bold');
+    // หัวคอลัมน์
+    sh.appendRow(FIELDS);
+    const hdr = sh.getRange(1, 1, 1, FIELDS.length);
+    hdr.setBackground('#1e3a8a')
+       .setFontColor('#ffffff')
+       .setFontWeight('bold')
+       .setFontSize(10);
+    sh.setFrozenRows(1);
+    sh.setColumnWidth(1, 140);  // id
+    sh.setColumnWidth(2, 90);   // date
+    sh.setColumnWidth(11, 160); // question
+    sh.setColumnWidth(12, 200); // answer
   }
   return sh;
 }
 
+// ── รับข้อมูลใหม่จากแอป (POST) ──────────────────────
 function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
     if (d.action === 'addRecord') {
       const sh = getOrCreateSheet();
-      sh.appendRow([
-        d.id, d.date, d.queue, d.qType,
-        d.tStart, d.tEnd, d.duration,
-        d.name, d.agency, d.channel,
-        d.question, d.answer, d.officer, d.ts
-      ]);
+
+      // ตรวจสอบว่า ID ซ้ำไหม (ป้องกัน duplicate)
+      const existing = sh.getDataRange().getValues();
+      const ids = existing.slice(1).map(r => String(r[0]));
+      if (ids.includes(String(d.id))) {
+        return resp({ status:'duplicate', message:'ID already exists' });
+      }
+
+      sh.appendRow(FIELDS.map(f => d[f] ?? ''));
     }
-    return resp({status:'ok'});
+    return resp({ status:'ok' });
   } catch(err) {
-    return resp({status:'error', message:err.message});
+    return resp({ status:'error', message: err.message });
   }
 }
 
+// ── ส่งข้อมูลทั้งหมดกลับให้แอป (GET) ─────────────────
 function doGet(e) {
-  const action = e.parameter.action;
-  if (action === 'ping') return resp({status:'ok',message:'CGD Service Log API ready'});
+  const action = e.parameter.action || 'getAll';
 
-  const sh = getOrCreateSheet();
-  const rows = sh.getDataRange().getValues();
-  const hdrs = rows[0];
-  const records = rows.slice(1).map(row => {
-    const obj = {};
-    hdrs.forEach((h,i) => obj[h] = row[i]);
-    return obj;
-  });
-  return resp({status:'ok', count:records.length, records});
+  if (action === 'ping') {
+    return resp({ status:'ok', message:'CGD ServiceLog API ready ✅' });
+  }
+
+  if (action === 'getAll') {
+    const sh = getOrCreateSheet();
+    const rows = sh.getDataRange().getValues();
+    if (rows.length <= 1) return resp({ status:'ok', records:[], count:0 });
+
+    const hdrs = rows[0]; // FIELDS array
+    const records = rows.slice(1)
+      .filter(row => row[0]) // กรองแถวว่าง
+      .map(row => {
+        const obj = {};
+        hdrs.forEach((h, i) => {
+          // แปลง duration เป็น number
+          obj[h] = (h === 'duration') ? (Number(row[i]) || null) : String(row[i] ?? '');
+        });
+        return obj;
+      });
+
+    return resp({ status:'ok', count: records.length, records });
+  }
+
+  return resp({ status:'error', message:'Unknown action' });
 }
 
 function resp(obj) {
@@ -1255,13 +1574,29 @@ function resp(obj) {
    TAB NAVIGATION
 ══════════════════════════════════════════════ */
 function showTab(btn, id) {
+  if(id === 'settings') {
+    requireAdmin(() => _openTab(btn, id));
+    return;
+  }
+  _openTab(btn, id);
+}
+
+function _openTab(btn, id) {
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='records') renderRecords();
+  if(id==='records') { buildOfficerFilter(); renderRecords(); }
   if(id==='report')  renderReport();
   if(id==='settings'){ updateCounts(); buildStaffList(); }
+}
+
+function buildOfficerFilter() {
+  const sel = document.getElementById('flt-officer');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">ทุกเจ้าหน้าที่</option>';
+  staff.forEach(s => sel.add(new Option(s, s)));
+  sel.value = cur;
 }
 
 /* ══════════════════════════════════════════════
@@ -1329,8 +1664,121 @@ function highlight(id) {
   }, 2500);
 }
 
+/* ══════════════════════════════════════════════
+   DATE RANGE — รายการบริการ
+══════════════════════════════════════════════ */
+function toggleRecDateRange() {
+  const val = document.getElementById('flt-date').value;
+  const box = document.getElementById('rec-date-range');
+  box.style.display = val === 'custom' ? 'flex' : 'none';
+  if(val === 'custom') {
+    // ค่าเริ่มต้น: เดือนนี้
+    if(!document.getElementById('rec-from').value) {
+      const now = new Date();
+      document.getElementById('rec-from').value = isoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+      document.getElementById('rec-to').value   = isoDate(now);
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════
+   DATE RANGE — รายงานสรุป
+══════════════════════════════════════════════ */
+function setRptCustomToday() {
+  const now = new Date();
+  document.getElementById('rpt-from').value = isoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  document.getElementById('rpt-to').value   = isoDate(now);
+  renderReport();
+}
+
+/* ══════════════════════════════════════════════
+   ADMIN AUTHENTICATION
+══════════════════════════════════════════════ */
+const DEFAULT_PIN = 'cgd2568';
+let adminLoggedIn = false; // session-based เท่านั้น
+
+function getAdminPin() {
+  return localStorage.getItem('cgd_admin_pin') || DEFAULT_PIN;
+}
+
+function requireAdmin(callback) {
+  if(adminLoggedIn) { callback(); return; }
+  document.getElementById('admin-pin-input').value = '';
+  document.getElementById('admin-pin-err').style.display = 'none';
+  document.getElementById('admin-modal').classList.remove('hidden');
+  // เก็บ callback ไว้รอ
+  window._adminCallback = callback;
+  setTimeout(() => document.getElementById('admin-pin-input').focus(), 150);
+}
+
+function checkAdminPin() {
+  const input = document.getElementById('admin-pin-input').value;
+  if(input === getAdminPin()) {
+    adminLoggedIn = true;
+    document.getElementById('admin-modal').classList.add('hidden');
+    document.getElementById('admin-pin-err').style.display = 'none';
+    if(typeof window._adminCallback === 'function') {
+      window._adminCallback();
+      window._adminCallback = null;
+    }
+  } else {
+    document.getElementById('admin-pin-err').style.display = 'block';
+    document.getElementById('admin-pin-input').value = '';
+    document.getElementById('admin-pin-input').focus();
+    // สั่นกล่อง
+    const box = document.getElementById('admin-pin-input');
+    box.style.animation = 'none';
+    box.offsetHeight;
+    box.style.animation = 'shake .4s ease';
+  }
+}
+
+function closeAdminModal() {
+  document.getElementById('admin-modal').classList.add('hidden');
+  window._adminCallback = null;
+  // กลับไปแท็บก่อนหน้า
+  document.querySelector('.tab-btn.active')?.click() ||
+  document.querySelector('[data-tab="form"]')?.click();
+}
+
+function changePin() {
+  const old     = document.getElementById('old-pin').value;
+  const newPin  = document.getElementById('new-pin').value;
+  const confirm = document.getElementById('confirm-pin').value;
+  if(old !== getAdminPin())    { toast('❌ รหัสผ่านปัจจุบันไม่ถูกต้อง'); return; }
+  if(newPin.length < 4)        { toast('⚠️ รหัสผ่านใหม่ต้องมีอย่างน้อย 4 ตัวอักษร'); return; }
+  if(newPin !== confirm)       { toast('❌ รหัสผ่านใหม่ไม่ตรงกัน'); return; }
+  localStorage.setItem('cgd_admin_pin', newPin);
+  document.getElementById('old-pin').value = '';
+  document.getElementById('new-pin').value = '';
+  document.getElementById('confirm-pin').value = '';
+  toast('✅ เปลี่ยนรหัสผ่านเรียบร้อยแล้ว');
+}
+
+/* ══════════════════════════════════════════════
+   ข้อควรรู้ก่อนใช้
+══════════════════════════════════════════════ */
+function showNotice() {
+  const hide = localStorage.getItem('cgd_notice_hide') === '1';
+  if(!hide) {
+    document.getElementById('notice-modal').classList.remove('hidden');
+  }
+}
+
+function closeNotice() {
+  if(document.getElementById('notice-noshowcheck').checked) {
+    localStorage.setItem('cgd_notice_hide', '1');
+  }
+  document.getElementById('notice-modal').classList.add('hidden');
+}
+
 /* ══ START ══ */
 init();
+showNotice();
+// Auto-sync เมื่อเปิดแอปและมี URL ตั้งค่าไว้
+if(gasUrl) {
+  setTimeout(() => syncFromGAS(), 800);
+}
 </script>
 </body>
 </html>
