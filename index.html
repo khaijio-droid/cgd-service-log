@@ -1452,6 +1452,28 @@ async function postGas(rec) {
   } catch(err) { console.warn('GAS post error:', err); }
 }
 
+/* แปลงค่า gviz cell — จัดการ Date(year,month,day,...) ที่ Google Sheets ส่งมา */
+function parseGvizCell(col, cell) {
+  if(!cell || cell.v === null || cell.v === undefined) return '';
+  const v = cell.v;
+  // gviz ส่ง date/time เป็น "Date(year,month0,day,hour,min,sec)"
+  if(typeof v === 'string' && v.startsWith('Date(')) {
+    const p = v.slice(5,-1).split(',').map(Number);
+    if(col === 'date') {
+      const mm = String(p[1]+1).padStart(2,'0');
+      const dd = String(p[2]).padStart(2,'0');
+      return `${p[0]}-${mm}-${dd}`;
+    }
+    if(col === 'tStart' || col === 'tEnd') {
+      const hh = String(p[3]||0).padStart(2,'0');
+      const mn = String(p[4]||0).padStart(2,'0');
+      return `${hh}:${mn}`;
+    }
+    return cell.f || String(v);
+  }
+  return String(v);
+}
+
 /* อ่านข้อมูลจาก Google Sheets โดยตรงผ่าน gviz API (CORS-safe, ไม่ผ่าน GAS) */
 async function readFromGviz(sid) {
   const url = `https://docs.google.com/spreadsheets/d/${sid}/gviz/tq?tqx=out:json&sheet=ServiceLog`;
@@ -1470,12 +1492,11 @@ async function readFromGviz(sid) {
     .map(row => {
       const obj = {};
       cols.forEach((col, i) => {
-        const cell = row.c ? row.c[i] : null;
-        obj[col] = (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v) : '';
+        obj[col] = parseGvizCell(col, row.c ? row.c[i] : null);
       });
       return obj;
     })
-    .filter(r => r.id); // กรองแถวที่ไม่มี id ออก
+    .filter(r => r.id);
 }
 
 /* ดึงข้อมูลทั้งหมดจาก Cloud มารวมกับ local */
@@ -1683,8 +1704,21 @@ function doGet(e) {
       .map(row => {
         const obj = {};
         hdrs.forEach((h, i) => {
-          // แปลง duration เป็น number
-          obj[h] = (h === 'duration') ? (Number(row[i]) || null) : String(row[i] ?? '');
+          const val = row[i];
+          if(val instanceof Date) {
+            // Google Sheets เก็บ date/time เป็น Date object — ต้องแปลงให้ถูก format
+            if(h === 'date') {
+              obj[h] = Utilities.formatDate(val, 'Asia/Bangkok', 'yyyy-MM-dd');
+            } else if(h === 'tStart' || h === 'tEnd') {
+              obj[h] = Utilities.formatDate(val, 'Asia/Bangkok', 'HH:mm');
+            } else {
+              obj[h] = String(val);
+            }
+          } else if(h === 'duration') {
+            obj[h] = Number(val) || null;
+          } else {
+            obj[h] = String(val ?? '');
+          }
         });
         return obj;
       });
