@@ -210,11 +210,15 @@ tbody tr:last-child td{border-bottom:none}
 
 /* ── PRINT ── */
 @media print{
+  /* ซ่อนทุกอย่างยกเว้นเนื้อหารายงาน */
   header,.tab-bar,.toolbar,.rpt-nav,.period-nav,.btn-submit,
-  .btn,.modal-ov,#toast,.set-card{display:none!important}
-  .tab-pane{display:block!important;padding:0}
+  .btn,.modal-ov,#toast,.set-card,
+  #tab-form,#tab-records,#tab-settings{display:none!important}
+  /* แสดงเฉพาะ tab รายงานสรุป */
+  #tab-report{display:block!important;padding:0}
   body{background:#fff}
   table{box-shadow:none}
+  .form-card,.rpt-card{box-shadow:none;border:1px solid #e5e7eb}
 }
 </style>
 </head>
