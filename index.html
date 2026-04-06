@@ -462,11 +462,23 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </details>
     <div class="form-group">
-      <label>Google Apps Script Web App URL</label>
+      <label>Google Apps Script Web App URL <span style="font-weight:400;color:#6b7280">(สำหรับ <strong>เขียน</strong> ข้อมูลขึ้น Cloud)</span></label>
       <div class="input-row">
-        <input type="url" id="gas-url-in" placeholder="https://script.google.com/macros/s/AKfycbyCHLcgkPajWc6M3IlKh9zTEB7kBLROCLELowvMUv98MVKMqnoTguIYkjLT_c1vNMzUOQ/exec"/>
+        <input type="url" id="gas-url-in" placeholder="https://script.google.com/macros/s/.../exec"/>
         <button class="btn btn-blue" onclick="saveGasUrl()" style="flex-shrink:0">บันทึก URL</button>
         <button class="btn btn-gray" onclick="testGas()"    style="flex-shrink:0">ทดสอบ</button>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:14px">
+      <label>Google Sheet ID <span style="font-weight:400;color:#6b7280">(สำหรับ <strong>อ่าน/Sync</strong> ข้อมูล — แก้ปัญหา CORS)</span></label>
+      <div class="info-box" style="margin-bottom:8px;font-size:.83rem;background:#ede9fe;border-color:#c4b5fd;color:#5b21b6">
+        📌 <strong>วิธีหา Sheet ID:</strong> เปิด Google Sheet แล้วดู URL<br/>
+        <code style="background:rgba(0,0,0,.07);padding:2px 6px;border-radius:4px">docs.google.com/spreadsheets/d/<strong>← คัดลอกส่วนนี้ →</strong>/edit</code><br/>
+        จากนั้น <strong>แชร์ Sheet → Share → Anyone with the link → Viewer</strong>
+      </div>
+      <div class="input-row">
+        <input type="text" id="gas-sheet-id-in" placeholder="เช่น 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"/>
+        <button class="btn btn-blue" onclick="saveSheetId()" style="flex-shrink:0">บันทึก ID</button>
       </div>
     </div>
   </div>
@@ -660,6 +672,7 @@ const CH_TXTCL = { walkin:'#1d4ed8', line:'#065f46', fb:'#5b21b6', phone:'#78350
 let records = [];
 let staff   = [];
 let gasUrl  = '';
+let sheetId = '';
 let cfg     = { office:'สำนักงานคลังจังหวัด', province:'' };
 let selCh   = '';
 let rptType = 'daily';
@@ -683,7 +696,8 @@ function init() {
   updateSyncBadge();
   updateCounts();
   document.getElementById('gas-code-pre').textContent = gasCode();
-  document.getElementById('gas-url-in').value  = gasUrl;
+  document.getElementById('gas-url-in').value      = gasUrl;
+  document.getElementById('gas-sheet-id-in').value = sheetId;
   document.getElementById('cfg-office').value  = cfg.office;
   document.getElementById('cfg-province').value= cfg.province;
 }
@@ -710,7 +724,8 @@ function loadData() {
     "นางสาวดลยา พันธ์นาม",
     "นายภุชงค์ ลครวงษ์"
   ]));
-  gasUrl  = localStorage.getItem('cgd_gas_url') || '';
+  gasUrl  = localStorage.getItem('cgd_gas_url')   || '';
+  sheetId = localStorage.getItem('cgd_sheet_id')  || '';
   cfg     = JSON.parse(localStorage.getItem('cgd_cfg') || '{"office":"สำนักงานคลังจังหวัดอำนาจเจริญ","province":"อำนาจเจริญ"}');
 }
 
@@ -841,29 +856,29 @@ function submitForm(e) {
   if(!vQuestion){ highlight('f-question'); toast('⚠️ กรุณาระบุคำถาม/เรื่องที่ขอรับบริการ'); return; }
   if(!vAnswer)  { highlight('f-answer');   toast('⚠️ กรุณาระบุคำตอบ/คำปรึกษา'); return; }
 
+  const qType = vQType;
   const qNum  = vQNum;
   const svc   = SERVICES.find(s => s.id === qType);
   const qStr  = svc
-    ? svc.prefix + (qNum || '')
+    ? svc.prefix + qNum
     : (qNum || '—');
 
-  const officer = document.getElementById('f-officer').value;
+  const officer = vOfficer;
   localStorage.setItem('cgd_last_officer', officer);
 
-  const tStart = document.getElementById('f-tstart').value;
-  const tEnd   = document.getElementById('f-tend').value;
+  const tStart = vTStart;
+  const tEnd   = vTEnd;
   const dur    = calcMins(tStart, tEnd);
 
-  const chId     = document.getElementById('f-channel').value;
-  const chOther  = document.getElementById('f-channel-other').value.trim();
-  // ถ้าเลือก "อื่นๆ" ต้องระบุข้อความด้วย
+  const chId    = vChannel;
+  const chOther = document.getElementById('f-channel-other').value.trim();
   if(chId === 'other' && !chOther) {
     toast('⚠️ กรุณาระบุช่องทางการให้บริการในช่อง "อื่นๆ"'); return;
   }
 
   const rec = {
     id:           Date.now().toString(),
-    date:         document.getElementById('f-date').value,
+    date:         vDate,
     queue:        qStr,
     qType:        qType,
     tStart,
@@ -1371,21 +1386,55 @@ async function postGas(rec) {
   } catch(err) { console.warn('GAS post error:', err); }
 }
 
-/* ดึงข้อมูลทั้งหมดจาก GAS มารวมกับ local */
+/* อ่านข้อมูลจาก Google Sheets โดยตรงผ่าน gviz API (CORS-safe, ไม่ผ่าน GAS) */
+async function readFromGviz(sid) {
+  const url = `https://docs.google.com/spreadsheets/d/${sid}/gviz/tq?tqx=out:json&sheet=ServiceLog`;
+  const resp = await fetch(url);
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  const text = await resp.text();
+  // ลอก JSONP wrapper: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+  const clean = text.replace(/^[^\[{]*/, '').replace(/\s*\);\s*$/, '');
+  const json  = JSON.parse(clean);
+  const table = json.table;
+  if(!table || !table.cols || !table.rows) return [];
+  const cols = table.cols.map(c => c.label || c.id);
+  return table.rows
+    .filter(row => row && row.c)
+    .map(row => {
+      const obj = {};
+      cols.forEach((col, i) => {
+        const cell = row.c ? row.c[i] : null;
+        obj[col] = (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v) : '';
+      });
+      return obj;
+    })
+    .filter(r => r.id); // กรองแถวที่ไม่มี id ออก
+}
+
+/* ดึงข้อมูลทั้งหมดจาก Cloud มารวมกับ local */
 async function syncFromGAS() {
-  if(!gasUrl) return;
+  if(!gasUrl && !sheetId) return;
   setSyncState('syncing');
   try {
-    const resp = await fetch(gasUrl+'?action=getAll', {redirect:'follow'});
-    if(!resp.ok) throw new Error('HTTP '+resp.status);
-    const data = await resp.json();
+    let cloudRecords = [];
 
-    if(data.records && Array.isArray(data.records)) {
+    if(sheetId) {
+      // ✅ อ่านผ่าน gviz API — ไม่มีปัญหา CORS
+      cloudRecords = await readFromGviz(sheetId);
+    } else {
+      // Fallback: อ่านผ่าน GAS doGet (อาจเจอปัญหา CORS ใน Chrome)
+      const resp = await fetch(gasUrl+'?action=getAll', {redirect:'follow'});
+      if(!resp.ok) throw new Error('HTTP '+resp.status);
+      const data = await resp.json();
+      cloudRecords = data.records || [];
+    }
+
+    if(Array.isArray(cloudRecords) && cloudRecords.length > 0) {
       // Merge: ใช้ ID เป็น key ข้อมูล cloud ทับ local ถ้า id ซ้ำกัน
       const merged = {};
       records.forEach(r => { if(r.id) merged[r.id] = r; });
-      data.records.forEach(r => { if(r.id) merged[r.id] = r; });
-      records = Object.values(merged).sort((a,b)=>b.id.localeCompare(a.id));
+      cloudRecords.forEach(r => { if(r.id) merged[r.id] = r; });
+      records = Object.values(merged).sort((a,b) => b.id.localeCompare(a.id));
       saveRecs();
       renderRecords();
       renderReport();
@@ -1402,10 +1451,19 @@ async function syncFromGAS() {
   }
 }
 
+/* บันทึก Sheet ID และ Sync ทันที */
+function saveSheetId() {
+  sheetId = document.getElementById('gas-sheet-id-in').value.trim();
+  localStorage.setItem('cgd_sheet_id', sheetId);
+  updateSyncBadge();
+  if(sheetId) { syncFromGAS(); }
+  toast(sheetId ? '✅ บันทึก Sheet ID แล้ว กำลัง Sync...' : '🔌 ยกเลิก Sheet ID');
+}
+
 /* Sync ด้วยตนเอง (กดปุ่ม) */
 function manualSync() {
-  if(!gasUrl) {
-    toast('⚠️ ยังไม่ได้ตั้งค่า Google Sheets URL — ไปที่ ⚙️ ตั้งค่า');
+  if(!gasUrl && !sheetId) {
+    toast('⚠️ ยังไม่ได้ตั้งค่า Google Sheets — ไปที่ ⚙️ ตั้งค่า');
     document.querySelector('[data-tab="settings"]').click();
     return;
   }
@@ -1430,7 +1488,7 @@ function setSyncState(state) {
       const d = new Date(lastSync);
       lbl.textContent = 'Sync ล่าสุด: ' + dateTH(isoDate(d)) + ' ' + hhmm(d);
     } else {
-      lbl.textContent = gasUrl ? 'กด Sync เพื่อดึงข้อมูล' : 'ยังไม่ได้ตั้งค่า Cloud';
+      lbl.textContent = (gasUrl||sheetId) ? 'กด Sync เพื่อดึงข้อมูล' : 'ยังไม่ได้ตั้งค่า Cloud';
     }
     cnt.textContent = records.length ? `(${records.length} รายการ)` : '';
   }
@@ -1441,12 +1499,14 @@ function setSyncState(state) {
 }
 
 function updateSyncBadge() {
-  const lastSync = localStorage.getItem('cgd_last_sync');
+  const lastSync  = localStorage.getItem('cgd_last_sync');
+  const connected = gasUrl || sheetId;
   let cls, html;
-  if(gasUrl && lastSync) {
+  if(connected && lastSync) {
+    const via = sheetId ? 'gviz' : 'GAS';
     cls  = 'sync-badge sb-on';
-    html = '<span class="dot dot-g"></span> Cloud (Google Sheets)';
-  } else if(gasUrl) {
+    html = `<span class="dot dot-g"></span> Cloud (Google Sheets · ${via})`;
+  } else if(connected) {
     cls  = 'sync-badge sb-on';
     html = '<span class="dot dot-g"></span> Cloud (ยังไม่ได้ Sync)';
   } else {
@@ -1775,8 +1835,8 @@ function closeNotice() {
 /* ══ START ══ */
 init();
 showNotice();
-// Auto-sync เมื่อเปิดแอปและมี URL ตั้งค่าไว้
-if(gasUrl) {
+// Auto-sync เมื่อเปิดแอปและมีการตั้งค่า Cloud ไว้
+if(gasUrl || sheetId) {
   setTimeout(() => syncFromGAS(), 800);
 }
 </script>
