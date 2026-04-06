@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>บันทึกการให้บริการ/ให้คำปรึกษา — สำนักงานคลังจังหวัดอำนาจเจริญ</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#1e3a8a;--primary-lt:#dbeafe;--primary-mid:#1a56db;
+  --green:#065f46;--green-lt:#d1fae5;
+  --red:#991b1b;--red-lt:#fee2e2;
+  --amber:#78350f;--amber-lt:#fef3c7;
+  --purple:#5b21b6;--purple-lt:#ede9fe;
+  --teal:#0f766e;--teal-lt:#ccfbf1;
+  --gray:#374151;--gray-lt:#f3f4f6;--border:#e5e7eb;
+  --shadow:0 2px 10px rgba(0,0,0,.09);--r:12px;
+}
+body{font-family:'Sarabun','Segoe UI',sans-serif;background:#eef2f7;color:var(--gray);min-height:100vh}
+
+/* ── HEADER ── */
+header{
+  background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;
+  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 3px 14px rgba(30,58,138,.4);position:sticky;top:0;z-index:100;
+}
+.hd-left{display:flex;align-items:center;gap:12px}
+.hd-logo{width:46px;height:46px;background:rgba(255,255,255,.2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.hd-title{font-size:1.15rem;font-weight:700;letter-spacing:.2px}
+.hd-sub{font-size:.78rem;opacity:.8;margin-top:2px}
+#clock{font-size:1.4rem;font-weight:700;letter-spacing:2px;
+  background:rgba(255,255,255,.15);padding:6px 16px;border-radius:8px;font-variant-numeric:tabular-nums}
+
+/* ── TABS ── */
+.tab-bar{display:flex;background:#fff;border-bottom:2px solid var(--border);
+  padding:0 24px;gap:4px;overflow-x:auto;position:sticky;top:74px;z-index:99;
+  box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.tab-btn{padding:13px 20px;border:none;background:none;cursor:pointer;
+  font-size:.9rem;font-weight:600;color:#6b7280;border-bottom:3px solid transparent;
+  margin-bottom:-2px;white-space:nowrap;transition:color .2s,border-color .2s}
+.tab-btn.active{color:var(--primary-mid);border-bottom-color:var(--primary-mid)}
+.tab-btn:hover:not(.active){color:var(--gray)}
+.tab-pane{display:none;padding:24px 16px;max-width:1140px;margin:0 auto}
+.tab-pane.active{display:block}
+
+/* ── FORM CARD ── */
+.form-card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:28px;margin-bottom:20px}
+.form-title{font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:20px;
+  display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--primary-lt);padding-bottom:12px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+label{font-size:.87rem;font-weight:600;color:var(--gray)}
+.req{color:#ef4444;margin-left:3px}
+input,select,textarea{
+  padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-family:inherit;font-size:.92rem;color:var(--gray);background:#fff;
+  transition:border-color .2s,box-shadow .2s;width:100%;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--primary-mid);box-shadow:0 0 0 3px rgba(26,86,219,.12);}
+textarea{resize:vertical;min-height:84px}
+.queue-row{display:flex;gap:10px;align-items:flex-start}
+.queue-row select{flex:0 0 auto}
+.queue-row input{flex:1;min-width:0}
+
+/* ── CHANNEL ── */
+.channel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:10px;margin-top:4px}
+.ch-btn{
+  padding:11px 14px;border:2px solid var(--border);border-radius:8px;
+  background:#fff;cursor:pointer;font-size:.88rem;font-weight:600;color:#6b7280;
+  transition:all .2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.ch-btn.sel{border-color:var(--primary-mid);background:var(--primary-lt);color:var(--primary)}
+.ch-btn:hover:not(.sel){border-color:#9ca3af;background:var(--gray-lt)}
+
+/* ── DURATION ── */
+.dur-box{
+  padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;
+  background:var(--gray-lt);font-size:.92rem;font-weight:600;color:var(--primary);
+  min-height:42px;display:flex;align-items:center;
+}
+
+/* ── SUBMIT ── */
+.btn-submit{
+  width:100%;padding:15px;font-size:1rem;font-weight:700;
+  background:linear-gradient(135deg,#1a56db,#3b82f6);color:#fff;
+  border:none;border-radius:10px;cursor:pointer;
+  transition:transform .15s,box-shadow .15s;margin-top:8px;
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(26,86,219,.4)}
+
+/* ── TOOLBAR / BUTTONS ── */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.srch{flex:1;min-width:180px}
+.btn{padding:9px 16px;border:none;border-radius:8px;cursor:pointer;
+  font-size:.85rem;font-weight:600;transition:opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-blue{background:var(--primary);color:#fff}
+.btn-green{background:#059669;color:#fff}
+.btn-red{background:#dc2626;color:#fff}
+.btn-gray{background:#e5e7eb;color:#374151}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:#fff;
+  border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;font-size:.84rem}
+thead th{background:var(--primary);color:#fff;padding:11px 12px;text-align:left;
+  white-space:nowrap;font-weight:600;font-size:.82rem}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+tbody tr:hover td{background:var(--gray-lt)}
+tbody tr:last-child td{border-bottom:none}
+.td-trunc{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{padding:3px 10px;border-radius:12px;font-size:.74rem;font-weight:700;white-space:nowrap}
+
+/* ── REPORT ── */
+.rpt-nav{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.rpt-btn{padding:9px 20px;border:2px solid var(--border);border-radius:8px;
+  background:#fff;cursor:pointer;font-size:.88rem;font-weight:600;color:#6b7280;transition:all .2s}
+.rpt-btn.active{border-color:var(--primary-mid);background:var(--primary-lt);color:var(--primary)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;margin-bottom:22px}
+.stat-box{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:18px;text-align:center}
+.stat-val{font-size:2.4rem;font-weight:800;line-height:1}
+.stat-lbl{font-size:.76rem;margin-top:4px;color:#6b7280}
+.chart-box{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+.chart-ttl{font-size:.93rem;font-weight:700;color:var(--primary);margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.bar-lbl{width:190px;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-track{flex:1;height:24px;background:var(--gray-lt);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width .5s ease;
+  display:flex;align-items:center;padding:0 8px;font-size:.74rem;font-weight:700;color:#fff;min-width:2px}
+.bar-n{width:36px;text-align:right;font-size:.82rem;font-weight:700}
+.period-nav{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.period-lbl{font-weight:700;font-size:.98rem;color:var(--primary)}
+
+/* ── SETTINGS ── */
+.set-card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:24px;margin-bottom:18px}
+.set-ttl{font-size:.98rem;font-weight:700;color:var(--primary);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.info-box{background:var(--primary-lt);border:1.5px solid #93c5fd;border-radius:8px;
+  padding:14px;font-size:.85rem;color:#1e40af;line-height:1.8;margin-bottom:14px}
+.code-pre{background:#1f2937;color:#e5e7eb;border-radius:8px;padding:16px;
+  font-family:'Courier New',monospace;font-size:.73rem;line-height:1.6;
+  overflow-x:auto;white-space:pre;margin-top:10px;max-height:340px;overflow-y:auto}
+.sync-badge{display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:600}
+.sb-on{background:var(--green-lt);color:var(--green)}
+.sb-off{background:var(--gray-lt);color:#6b7280}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-g{background:#059669}.dot-gr{background:#9ca3af}
+.tag-pill{display:inline-flex;align-items:center;gap:6px;
+  background:#f3f4f6;padding:5px 12px;border-radius:20px;font-size:.84rem;margin:3px}
+.tag-del{border:none;background:none;cursor:pointer;color:#ef4444;font-size:.9rem;padding:0}
+.staff-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;min-height:36px}
+.input-row{display:flex;gap:10px}
+.input-row input{flex:1}
+
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;z-index:500}
+.modal-ov.hidden{display:none}
+.modal-box{background:#fff;border-radius:16px;padding:30px;max-width:640px;width:92%;
+  max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-ttl{font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:18px}
+.modal-act{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.det-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.det-table th{padding:9px 12px;background:#f9fafb;font-weight:600;width:130px;
+  border:1px solid #e5e7eb;text-align:left;white-space:nowrap}
+.det-table td{padding:9px 12px;border:1px solid #e5e7eb;white-space:pre-wrap;word-break:break-word}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:#1f2937;color:#fff;padding:11px 24px;
+  border-radius:30px;font-size:.88rem;font-weight:600;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;
+  opacity:0;pointer-events:none;z-index:999;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr}
+  .queue-row{flex-direction:column}
+  .channel-grid{grid-template-columns:1fr 1fr}
+  header{padding:10px 14px}
+  #clock{font-size:1.05rem;padding:4px 10px}
+  .bar-lbl{width:130px}
+}
+
+/* ── PRINT ── */
+@media print{
+  header,.tab-bar,.toolbar,.rpt-nav,.period-nav,.btn-submit,
+  .btn,.modal-ov,#toast,.set-card{display:none!important}
+  .tab-pane{display:block!important;padding:0}
+  body{background:#fff}
+  table{box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="hd-left">
+    <div class="hd-logo">🏛️</div>
+    <div>
+      <div class="hd-title">สำนักงานคลังจังหวัดอำนาจเจริญ</div>
+      <div class="hd-sub">ระบบบันทึกการให้บริการ/ให้คำปรึกษา · กรมบัญชีกลาง</div>
+    </div>
+  </div>
+  <div id="clock">--:--:--</div>
+</header>
+
+<!-- ══ TABS ══ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="form"    onclick="showTab(this,'form')">📝 บันทึกบริการ</button>
+  <button class="tab-btn"        data-tab="records" onclick="showTab(this,'records')">📋 รายการบริการ</button>
+  <button class="tab-btn"        data-tab="report"  onclick="showTab(this,'report')">📊 รายงานสรุป</button>
+  <button class="tab-btn"        data-tab="settings"onclick="showTab(this,'settings')">⚙️ ตั้งค่า</button>
+</div>
+
+<!-- ══ TAB 1: FORM ══ -->
+<div class="tab-pane active" id="tab-form">
+  <div class="form-card">
+    <div class="form-title">📝 บันทึกการให้บริการ / ให้คำปรึกษา</div>
+    <form id="svc-form" onsubmit="submitForm(event)" novalidate>
+      <div class="form-grid">
+
+        <!-- วันที่ -->
+        <div class="form-group">
+          <label>วันที่<span class="req">*</span></label>
+          <input type="date" id="f-date" required/>
+        </div>
+
+        <!-- คิวบริการ -->
+        <div class="form-group">
+          <label>คิวบริการ (ประเภท + หมายเลข)</label>
+          <div class="queue-row">
+            <select id="f-qtype" onchange="onQueueTypeChange()" style="min-width:0;flex:2">
+              <option value="">-- ประเภทบริการ --</option>
+            </select>
+            <input type="text" id="f-qnum" placeholder="เช่น 001" maxlength="6" style="flex:1;min-width:80px"/>
+          </div>
+        </div>
+
+        <!-- เวลาเริ่มต้น -->
+        <div class="form-group">
+          <label>เวลาเริ่มต้น<span class="req">*</span></label>
+          <input type="time" id="f-tstart" required onchange="calcDur()"/>
+        </div>
+
+        <!-- เวลาสิ้นสุด -->
+        <div class="form-group">
+          <label>เวลาสิ้นสุด</label>
+          <input type="time" id="f-tend" onchange="calcDur()"/>
+        </div>
+
+        <!-- ระยะเวลา -->
+        <div class="form-group">
+          <label>ระยะเวลา (นาที)</label>
+          <div class="dur-box" id="dur-display">—</div>
+        </div>
+
+        <!-- ชื่อผู้รับบริการ -->
+        <div class="form-group">
+          <label>ชื่อผู้รับบริการ<span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="ชื่อ-นามสกุล" required/>
+        </div>
+
+        <!-- หน่วยงาน -->
+        <div class="form-group">
+          <label>หน่วยงาน / ประชาชนทั่วไป</label>
+          <input type="text" id="f-agency" placeholder="ชื่อหน่วยงาน หรือ ประชาชน"/>
+        </div>
+
+        <!-- เจ้าหน้าที่ -->
+        <div class="form-group">
+          <label>เจ้าหน้าที่ผู้ให้บริการ<span class="req">*</span></label>
+          <select id="f-officer" required>
+            <option value="">-- เลือกเจ้าหน้าที่ --</option>
+          </select>
+        </div>
+
+        <!-- ช่องทาง (full width) -->
+        <div class="form-group full">
+          <label>ช่องทางการให้บริการ / ให้คำปรึกษา<span class="req">*</span></label>
+          <div class="channel-grid" id="ch-grid"></div>
+          <input type="hidden" id="f-channel"/>
+          <div id="ch-other-wrap" style="display:none;margin-top:10px">
+            <input type="text" id="f-channel-other" placeholder="ระบุช่องทางการให้บริการ เช่น อีเมล, Line Official, ประชุมออนไลน์ ฯลฯ"/>
+          </div>
+        </div>
+
+        <!-- คำถาม (full width) -->
+        <div class="form-group full">
+          <label>คำถามที่ขอรับบริการ / ปรึกษา<span class="req">*</span></label>
+          <textarea id="f-question" placeholder="ระบุเรื่อง/คำถามที่ผู้รับบริการต้องการ..." rows="3" required></textarea>
+        </div>
+
+        <!-- คำตอบ (full width) -->
+        <div class="form-group full">
+          <label>คำตอบการให้บริการ / การให้คำปรึกษา</label>
+          <textarea id="f-answer" placeholder="ระบุคำตอบ/แนวทางที่แนะนำ..." rows="3"></textarea>
+        </div>
+
+      </div>
+      <button type="submit" class="btn-submit">💾 บันทึกการให้บริการ</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ TAB 2: RECORDS ══ -->
+<div class="tab-pane" id="tab-records">
+  <div class="toolbar">
+    <input type="text" class="srch" id="srch" placeholder="🔍 ค้นหา ชื่อ / หน่วยงาน / คำถาม..." oninput="renderRecords()"/>
+    <select id="flt-date" onchange="renderRecords()" style="width:auto">
+      <option value="">ทุกวัน</option>
+      <option value="today">วันนี้</option>
+      <option value="week">สัปดาห์นี้</option>
+      <option value="month">เดือนนี้</option>
+    </select>
+    <select id="flt-svc" onchange="renderRecords()" style="width:auto">
+      <option value="">ทุกประเภทบริการ</option>
+    </select>
+    <select id="flt-ch" onchange="renderRecords()" style="width:auto">
+      <option value="">ทุกช่องทาง</option>
+    </select>
+    <button class="btn btn-green" onclick="exportCSV()">📥 Export CSV</button>
+    <button class="btn btn-blue"  onclick="window.print()">🖨️ พิมพ์</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>#</th><th>วันที่</th><th>คิว</th>
+        <th>เวลาเริ่ม</th><th>เวลาสิ้นสุด</th><th>ระยะเวลา</th>
+        <th>ผู้รับบริการ</th><th>หน่วยงาน</th><th>ช่องทาง</th>
+        <th>คำถาม</th><th>คำตอบ</th><th>เจ้าหน้าที่</th><th>จัดการ</th>
+      </tr></thead>
+      <tbody id="rec-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ TAB 3: REPORT ══ -->
+<div class="tab-pane" id="tab-report">
+  <div class="rpt-nav">
+    <button class="rpt-btn active" onclick="setRptType('daily',this)">📅 รายวัน</button>
+    <button class="rpt-btn"        onclick="setRptType('weekly',this)">📆 รายสัปดาห์</button>
+    <button class="rpt-btn"        onclick="setRptType('monthly',this)">🗓️ รายเดือน</button>
+  </div>
+  <div class="period-nav">
+    <button class="btn btn-blue" onclick="rptNav(-1)">◀ ก่อนหน้า</button>
+    <span class="period-lbl" id="rpt-lbl">—</span>
+    <button class="btn btn-blue" onclick="rptNav(1)">ถัดไป ▶</button>
+    <button class="btn btn-gray" onclick="rptToday()">วันนี้/ปัจจุบัน</button>
+    <button class="btn btn-green" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
+  </div>
+  <div id="rpt-content"></div>
+</div>
+
+<!-- ══ TAB 4: SETTINGS ══ -->
+<div class="tab-pane" id="tab-settings">
+
+  <!-- สถานะ -->
+  <div class="set-card">
+    <div class="set-ttl">🔄 สถานะการเชื่อมต่อ</div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <span id="sync-badge" class="sync-badge sb-off">
+        <span class="dot dot-gr"></span> ออฟไลน์ (Local Storage)
+      </span>
+      <span style="font-size:.82rem;color:#6b7280">ข้อมูลเก็บในเครื่องนี้เท่านั้น</span>
+    </div>
+  </div>
+
+  <!-- Google Sheets Sync -->
+  <div class="set-card">
+    <div class="set-ttl">☁️ เชื่อมต่อ Google Sheets (ใช้งานร่วมกันออนไลน์)</div>
+    <div class="info-box">
+      ✅ ขั้นตอนการตั้งค่าใช้งานร่วมกันออนไลน์<br/>
+      1. เปิด <strong>Google Sheets</strong> สร้าง Spreadsheet ใหม่<br/>
+      2. เมนู <strong>Extensions → Apps Script</strong> แล้ววางโค้ดด้านล่าง<br/>
+      3. กด <strong>Deploy → New Deployment → Web App</strong><br/>
+      4. ตั้ง <strong>Execute as:</strong> Me, <strong>Who has access:</strong> Anyone → Deploy<br/>
+      5. คัดลอก Web App URL วางในช่องด้านล่าง แล้วกดบันทึก
+    </div>
+    <details style="margin-bottom:14px">
+      <summary style="cursor:pointer;font-size:.88rem;font-weight:600;color:var(--primary-mid);padding:4px 0">
+        📋 โค้ด Google Apps Script (คลิกเพื่อดู/คัดลอก)
+      </summary>
+      <div style="position:relative">
+        <button onclick="copyGasCode()" class="btn btn-gray"
+          style="position:absolute;top:8px;right:8px;font-size:.75rem;padding:5px 12px;z-index:1">
+          📋 คัดลอก
+        </button>
+        <pre class="code-pre" id="gas-code-pre"></pre>
+      </div>
+    </details>
+    <div class="form-group">
+      <label>Google Apps Script Web App URL</label>
+      <div class="input-row">
+        <input type="url" id="gas-url-in" placeholder="https://script.google.com/macros/s/.../exec"/>
+        <button class="btn btn-blue" onclick="saveGasUrl()" style="flex-shrink:0">บันทึก URL</button>
+        <button class="btn btn-gray" onclick="testGas()"    style="flex-shrink:0">ทดสอบ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- เจ้าหน้าที่ -->
+  <div class="set-card">
+    <div class="set-ttl">👤 รายชื่อเจ้าหน้าที่</div>
+    <div class="staff-wrap" id="staff-wrap"></div>
+    <div class="input-row">
+      <input type="text" id="staff-in" placeholder="ชื่อเจ้าหน้าที่ที่ต้องการเพิ่ม"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();addStaff()}"/>
+      <button class="btn btn-blue" onclick="addStaff()">+ เพิ่ม</button>
+    </div>
+  </div>
+
+  <!-- ชื่อสำนักงาน -->
+  <div class="set-card">
+    <div class="set-ttl">🏛️ ข้อมูลหน่วยงาน</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ชื่อสำนักงาน</label>
+        <input type="text" id="cfg-office" placeholder="เช่น สำนักงานคลังจังหวัดเชียงใหม่"/>
+      </div>
+      <div class="form-group">
+        <label>จังหวัด</label>
+        <input type="text" id="cfg-province" placeholder="เช่น เชียงใหม่"/>
+      </div>
+    </div>
+    <button class="btn btn-blue" onclick="saveConfig()" style="margin-top:12px">บันทึกข้อมูล</button>
+  </div>
+
+  <!-- จัดการข้อมูล -->
+  <div class="set-card">
+    <div class="set-ttl">💾 จัดการข้อมูล</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn btn-green" onclick="exportCSV()">📥 Export CSV</button>
+      <button class="btn btn-blue"  onclick="exportJSON()">📤 Export JSON</button>
+      <button class="btn btn-blue"  onclick="document.getElementById('imp-file').click()">
+        📥 Import JSON
+      </button>
+      <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(event)"/>
+      <button class="btn btn-red" onclick="clearAll()">🗑️ ล้างข้อมูลทั้งหมด</button>
+    </div>
+    <div style="font-size:.84rem;color:#6b7280">
+      ข้อมูลปัจจุบัน: <strong id="total-lbl" style="color:var(--primary)">0</strong> รายการ
+      &nbsp;|&nbsp; เจ้าหน้าที่: <strong id="staff-lbl" style="color:var(--primary)">0</strong> คน
+    </div>
+  </div>
+
+</div><!-- /settings -->
+
+<!-- ══ VIEW MODAL ══ -->
+<div class="modal-ov hidden" id="view-modal">
+  <div class="modal-box">
+    <div class="modal-ttl">📄 รายละเอียดการให้บริการ</div>
+    <div id="view-content"></div>
+    <div class="modal-act">
+      <button class="btn btn-gray" onclick="closeModal()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   CONSTANTS — ดึงจาก queue_cgd.html โดยตรง
+══════════════════════════════════════════════ */
+const SERVICES = [
+  { id:'proc', prefix:'จ', name:'จัดซื้อจัดจ้าง',              icon:'📦', color:'#1d4ed8', bg:'#dbeafe' },
+  { id:'law',  prefix:'ก', name:'กฎหมายระเบียบการเงินการคลัง', icon:'⚖️', color:'#6d28d9', bg:'#ede9fe' },
+  { id:'gfm',  prefix:'G', name:'GFMIS',                        icon:'💻', color:'#0f766e', bg:'#ccfbf1' },
+  { id:'eco',  prefix:'ศ', name:'เศรษฐกิจ',                     icon:'📈', color:'#b45309', bg:'#fef3c7' },
+  { id:'pen',  prefix:'บ', name:'บำเหน็จบำนาญ',                 icon:'🏅', color:'#b91c1c', bg:'#fee2e2' },
+  { id:'wel',  prefix:'ส', name:'งานสวัสดิการแห่งรัฐ',          icon:'🤝', color:'#065f46', bg:'#d1fae5' },
+];
+
+const CHANNELS = [
+  { id:'walkin', name:'ติดต่อด้วยตนเอง ณ สำนักงาน', icon:'🏢' },
+  { id:'line',   name:'Line',                         icon:'💚' },
+  { id:'fb',     name:'Facebook',                     icon:'💙' },
+  { id:'phone',  name:'โทรศัพท์',                     icon:'📞' },
+  { id:'other',  name:'อื่นๆ (ระบุ)',                 icon:'✏️' },
+];
+
+const CH_COLOR = { walkin:'#dbeafe', line:'#d1fae5', fb:'#ede9fe', phone:'#fef3c7', other:'#f3f4f6' };
+const CH_TXTCL = { walkin:'#1d4ed8', line:'#065f46', fb:'#5b21b6', phone:'#78350f', other:'#374151' };
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let records = [];
+let staff   = [];
+let gasUrl  = '';
+let cfg     = { office:'สำนักงานคลังจังหวัด', province:'' };
+let selCh   = '';
+let rptType = 'daily';
+let rptOff  = 0;
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+function init() {
+  loadData();
+  buildServiceSelect();
+  buildChannelButtons();
+  buildOfficerSelect();
+  buildFilterDropdowns();
+  buildStaffList();
+  setFormDefaults();
+  updateClock();
+  setInterval(updateClock, 1000);
+  renderRecords();
+  renderReport();
+  updateSyncBadge();
+  updateCounts();
+  document.getElementById('gas-code-pre').textContent = gasCode();
+  document.getElementById('gas-url-in').value  = gasUrl;
+  document.getElementById('cfg-office').value  = cfg.office;
+  document.getElementById('cfg-province').value= cfg.province;
+}
+
+function loadData() {
+  records = JSON.parse(localStorage.getItem('cgd_svc_records') || '[]');
+  staff   = JSON.parse(localStorage.getItem('cgd_staff')  || JSON.stringify([
+    "นางนิภาพรรณ เหล่าแค",
+    "นายณัฏฐ์กิตต์ วิเศษรัตน์",
+    "นายพงศกร แสวงหา",
+    "นางศุภรัตน์ วรรณโท",
+    "นายพรพิพัฒน์ เหมคุณ",
+    "นายพีระยุทธ์ เชื้อสุข",
+    "นางสาวธีรภัทร์ มาศขาว",
+    "นายสานิตย์ สารพันธ์",
+    "นางสาววิไลรัตน์ เวชกามา",
+    "นางสาวกรภัทร์ สุขโน",
+    "นางสาวอนุชสรา ช่วยมิตร",
+    "นางสาวชนิตรา จันทร์สว่าง",
+    "นายบดินทร์ โพธิมะโน",
+    "นางสาวอัฐพร คำบุรมย์",
+    "นางสาวสุภาพร วรรณภูมิ",
+    "นางสาวรัตนา วารินทร์",
+    "นางสาวดลยา พันธ์นาม",
+    "นายภุชงค์ ลครวงษ์"
+  ]));
+  gasUrl  = localStorage.getItem('cgd_gas_url') || '';
+  cfg     = JSON.parse(localStorage.getItem('cgd_cfg') || '{"office":"สำนักงานคลังจังหวัดอำนาจเจริญ","province":"อำนาจเจริญ"}');
+}
+
+function saveRecs() {
+  localStorage.setItem('cgd_svc_records', JSON.stringify(records));
+  updateCounts();
+}
+
+function saveStaff() {
+  localStorage.setItem('cgd_staff', JSON.stringify(staff));
+}
+
+function setFormDefaults() {
+  const now = new Date();
+  document.getElementById('f-date').value   = isoDate(now);
+  document.getElementById('f-tstart').value = hhmm(now);
+  const last = localStorage.getItem('cgd_last_officer') || '';
+  if(last) document.getElementById('f-officer').value = last;
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+/* ══════════════════════════════════════════════
+   UI BUILDERS
+══════════════════════════════════════════════ */
+function buildServiceSelect() {
+  const sel = document.getElementById('f-qtype');
+  SERVICES.forEach(s => sel.add(new Option(`${s.icon} ${s.prefix}  –  ${s.name}`, s.id)));
+}
+
+function buildChannelButtons() {
+  document.getElementById('ch-grid').innerHTML = CHANNELS.map(c =>
+    `<button type="button" class="ch-btn" data-id="${c.id}" onclick="pickChannel('${c.id}')">
+      ${c.icon} ${c.name}
+    </button>`
+  ).join('');
+}
+
+function pickChannel(id) {
+  selCh = id;
+  document.getElementById('f-channel').value = id;
+  document.querySelectorAll('.ch-btn').forEach(b =>
+    b.classList.toggle('sel', b.dataset.id === id));
+  // แสดง/ซ่อนช่องระบุอื่นๆ
+  const otherWrap = document.getElementById('ch-other-wrap');
+  const otherInput = document.getElementById('f-channel-other');
+  if(id === 'other') {
+    otherWrap.style.display = 'block';
+    otherInput.required = true;
+    otherInput.focus();
+  } else {
+    otherWrap.style.display = 'none';
+    otherInput.required = false;
+    otherInput.value = '';
+  }
+}
+
+function buildOfficerSelect() {
+  const sel  = document.getElementById('f-officer');
+  const last = localStorage.getItem('cgd_last_officer') || '';
+  sel.innerHTML = '<option value="">-- เลือกเจ้าหน้าที่ --</option>';
+  staff.forEach(s => {
+    const o = new Option(s, s);
+    if(s === last) o.selected = true;
+    sel.add(o);
+  });
+}
+
+function buildFilterDropdowns() {
+  const fs = document.getElementById('flt-svc');
+  fs.innerHTML = '<option value="">ทุกประเภทบริการ</option>';
+  SERVICES.forEach(s => fs.add(new Option(`${s.icon} ${s.name}`, s.id)));
+
+  const fc = document.getElementById('flt-ch');
+  fc.innerHTML = '<option value="">ทุกช่องทาง</option>';
+  CHANNELS.forEach(c => fc.add(new Option(`${c.icon} ${c.name}`, c.id)));
+}
+
+function buildStaffList() {
+  document.getElementById('staff-wrap').innerHTML = staff.map((s,i) =>
+    `<span class="tag-pill">👤 ${esc(s)}
+      <button class="tag-del" onclick="removeStaff(${i})">✕</button>
+    </span>`
+  ).join('');
+  document.getElementById('staff-lbl').textContent = staff.length;
+}
+
+function onQueueTypeChange() {
+  const svc = SERVICES.find(s => s.id === document.getElementById('f-qtype').value);
+  if(svc) document.getElementById('f-qnum').placeholder = `${svc.prefix}001`;
+  else    document.getElementById('f-qnum').placeholder = 'เช่น 001';
+}
+
+/* ══════════════════════════════════════════════
+   FORM SUBMIT
+══════════════════════════════════════════════ */
+function submitForm(e) {
+  e.preventDefault();
+
+  // ── Validation ──────────────────────────────────
+  const vDate     = document.getElementById('f-date').value;
+  const vTStart   = document.getElementById('f-tstart').value;
+  const vName     = document.getElementById('f-name').value.trim();
+  const vOfficer  = document.getElementById('f-officer').value;
+  const vQuestion = document.getElementById('f-question').value.trim();
+  const vChannel  = document.getElementById('f-channel').value;
+
+  if(!vDate)     { highlight('f-date');     toast('⚠️ กรุณาระบุวันที่'); return; }
+  if(!vTStart)   { highlight('f-tstart');   toast('⚠️ กรุณาระบุเวลาเริ่มต้น'); return; }
+  if(!vName)     { highlight('f-name');     toast('⚠️ กรุณาระบุชื่อผู้รับบริการ'); return; }
+  if(!vOfficer)  { highlight('f-officer');  toast('⚠️ กรุณาเลือกเจ้าหน้าที่ผู้ให้บริการ'); return; }
+  if(!vChannel)  { document.getElementById('ch-grid').scrollIntoView({behavior:'smooth',block:'center'});
+                   toast('⚠️ กรุณาเลือกช่องทางการให้บริการ'); return; }
+  if(!vQuestion) { highlight('f-question'); toast('⚠️ กรุณาระบุคำถาม/เรื่องที่ขอรับบริการ'); return; }
+
+  const qType = document.getElementById('f-qtype').value;
+  const qNum  = document.getElementById('f-qnum').value.trim();
+  const svc   = SERVICES.find(s => s.id === qType);
+  const qStr  = svc
+    ? svc.prefix + (qNum || '')
+    : (qNum || '—');
+
+  const officer = document.getElementById('f-officer').value;
+  localStorage.setItem('cgd_last_officer', officer);
+
+  const tStart = document.getElementById('f-tstart').value;
+  const tEnd   = document.getElementById('f-tend').value;
+  const dur    = calcMins(tStart, tEnd);
+
+  const chId     = document.getElementById('f-channel').value;
+  const chOther  = document.getElementById('f-channel-other').value.trim();
+  // ถ้าเลือก "อื่นๆ" ต้องระบุข้อความด้วย
+  if(chId === 'other' && !chOther) {
+    toast('⚠️ กรุณาระบุช่องทางการให้บริการในช่อง "อื่นๆ"'); return;
+  }
+
+  const rec = {
+    id:           Date.now().toString(),
+    date:         document.getElementById('f-date').value,
+    queue:        qStr,
+    qType:        qType,
+    tStart,
+    tEnd,
+    duration:     dur,
+    name:         document.getElementById('f-name').value.trim(),
+    agency:       document.getElementById('f-agency').value.trim(),
+    channel:      chId,
+    channelOther: chId === 'other' ? chOther : '',
+    question:     document.getElementById('f-question').value.trim(),
+    answer:       document.getElementById('f-answer').value.trim(),
+    officer,
+    ts:           new Date().toISOString(),
+  };
+
+  records.push(rec);
+  saveRecs();
+
+  if(gasUrl) postGas(rec);
+
+  toast('✅ บันทึกการให้บริการเรียบร้อยแล้ว');
+
+  // Reset – keep date & officer
+  const savedDate = document.getElementById('f-date').value;
+  document.getElementById('svc-form').reset();
+  document.getElementById('f-date').value    = savedDate;
+  document.getElementById('f-officer').value = officer;
+  document.getElementById('f-tstart').value  = hhmm(new Date());
+  document.getElementById('dur-display').textContent = '—';
+  selCh = '';
+  document.querySelectorAll('.ch-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('f-channel').value = '';
+  document.getElementById('f-channel-other').value = '';
+  document.getElementById('ch-other-wrap').style.display = 'none';
+
+  renderRecords();
+  renderReport();
+}
+
+/* ══════════════════════════════════════════════
+   DURATION
+══════════════════════════════════════════════ */
+function calcDur() {
+  const m = calcMins(
+    document.getElementById('f-tstart').value,
+    document.getElementById('f-tend').value
+  );
+  document.getElementById('dur-display').textContent =
+    m === null ? '—' : m === 0 ? '< 1 นาที' : `${m} นาที`;
+}
+
+function calcMins(s, e) {
+  if(!s || !e) return null;
+  const [sh,sm] = s.split(':').map(Number);
+  const [eh,em] = e.split(':').map(Number);
+  const d = (eh*60+em)-(sh*60+sm);
+  return d >= 0 ? d : null;
+}
+
+/* ══════════════════════════════════════════════
+   RECORDS TAB
+══════════════════════════════════════════════ */
+function renderRecords() {
+  const q    = document.getElementById('srch').value.toLowerCase();
+  const fd   = document.getElementById('flt-date').value;
+  const fsvc = document.getElementById('flt-svc').value;
+  const fch  = document.getElementById('flt-ch').value;
+
+  let list = records.filter(r => {
+    if(fd === 'today' && r.date !== isoDate(new Date())) return false;
+    if(fd === 'week')  { const w = weekStart(new Date()); if(new Date(r.date) < w) return false; }
+    if(fd === 'month') {
+      const n=new Date(), d=new Date(r.date);
+      if(d.getFullYear()!==n.getFullYear()||d.getMonth()!==n.getMonth()) return false;
+    }
+    if(fsvc && r.qType !== fsvc) return false;
+    if(fch  && r.channel !== fch)  return false;
+    if(q) {
+      const hay=[r.name,r.agency,r.question,r.answer,r.officer,r.queue].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => b.id.localeCompare(a.id));
+
+  const tbody = document.getElementById('rec-tbody');
+  if(!list.length) {
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;color:#9ca3af;padding:28px">
+      ไม่พบข้อมูล</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((r,i) => {
+    const svc = SERVICES.find(s=>s.id===r.qType);
+    const ch  = CHANNELS.find(c=>c.id===r.channel);
+    return `<tr>
+      <td>${list.length-i}</td>
+      <td style="white-space:nowrap">${dateTH(r.date)}</td>
+      <td>
+        <span class="badge" style="background:${svc?.bg||'#f3f4f6'};color:${svc?.color||'#374151'}">
+          ${svc?.icon||''} ${esc(r.queue)||'—'}
+        </span>
+      </td>
+      <td style="white-space:nowrap">${r.tStart||'—'}</td>
+      <td style="white-space:nowrap">${r.tEnd||'—'}</td>
+      <td style="white-space:nowrap">${r.duration!=null?r.duration+' น.':'—'}</td>
+      <td>${esc(r.name)}</td>
+      <td class="td-trunc" title="${esc(r.agency)}">${esc(r.agency)||'—'}</td>
+      <td>
+        <span class="badge" style="background:${CH_COLOR[r.channel]||'#f3f4f6'};color:${CH_TXTCL[r.channel]||'#374151'}">
+          ${chDisplay(r)}
+        </span>
+      </td>
+      <td class="td-trunc" title="${esc(r.question)}">${esc(r.question)}</td>
+      <td class="td-trunc" title="${esc(r.answer)}">${esc(r.answer)||'—'}</td>
+      <td style="white-space:nowrap">${esc(r.officer)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-blue" style="margin-bottom:4px;font-size:.76rem;padding:5px 10px"
+          onclick="viewRec('${r.id}')">ดู</button><br/>
+        <button class="btn btn-red" style="font-size:.76rem;padding:5px 10px"
+          onclick="delRec('${r.id}')">ลบ</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function viewRec(id) {
+  const r = records.find(x=>x.id===id); if(!r) return;
+  const svc = SERVICES.find(s=>s.id===r.qType);
+  const ch  = CHANNELS.find(c=>c.id===r.channel);
+  const rows = [
+    ['วันที่',         dateTH(r.date)],
+    ['คิวบริการ',      (r.queue||'—')+(svc?` (${svc.name})`:'')],
+    ['เวลาเริ่มต้น',  r.tStart||'—'],
+    ['เวลาสิ้นสุด',   r.tEnd||'—'],
+    ['ระยะเวลา',       r.duration!=null?r.duration+' นาที':'—'],
+    ['ผู้รับบริการ',   esc(r.name)],
+    ['หน่วยงาน',       esc(r.agency)||'—'],
+    ['ช่องทาง',        chDisplay(r)],
+    ['เจ้าหน้าที่',   esc(r.officer)],
+  ];
+  document.getElementById('view-content').innerHTML =
+    `<table class="det-table">
+      ${rows.map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join('')}
+      <tr><th style="vertical-align:top">คำถาม</th><td>${esc(r.question)}</td></tr>
+      <tr><th style="vertical-align:top">คำตอบ</th><td>${esc(r.answer)||'—'}</td></tr>
+    </table>`;
+  document.getElementById('view-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('view-modal').classList.add('hidden');
+}
+
+function delRec(id) {
+  if(!confirm('ยืนยันการลบรายการนี้?')) return;
+  records = records.filter(r=>r.id!==id);
+  saveRecs(); renderRecords(); renderReport();
+  toast('🗑️ ลบรายการเรียบร้อย');
+}
+
+/* ══════════════════════════════════════════════
+   REPORTS
+══════════════════════════════════════════════ */
+function setRptType(t, btn) {
+  rptType = t; rptOff = 0;
+  document.querySelectorAll('.rpt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderReport();
+}
+
+function rptNav(d) { rptOff += d; renderReport(); }
+function rptToday() { rptOff = 0; renderReport(); }
+
+function renderReport() {
+  const now = new Date();
+  let list = [], lbl = '';
+
+  if(rptType === 'daily') {
+    const t = new Date(now); t.setDate(t.getDate()+rptOff);
+    const ds = isoDate(t);
+    lbl  = '📅 ' + dateTH(ds);
+    list = records.filter(r=>r.date===ds);
+  }
+  else if(rptType === 'weekly') {
+    const mon = weekStart(now);
+    mon.setDate(mon.getDate()+rptOff*7);
+    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+    lbl  = `📆 ${dateTH(isoDate(mon))} – ${dateTH(isoDate(sun))}`;
+    list = records.filter(r=>{ const d=new Date(r.date); return d>=mon&&d<=sun; });
+  }
+  else {
+    const t   = new Date(now.getFullYear(), now.getMonth()+rptOff, 1);
+    lbl  = `🗓️ ${t.toLocaleDateString('th-TH',{month:'long',year:'numeric'})}`;
+    list = records.filter(r=>{
+      const d=new Date(r.date);
+      return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth();
+    });
+  }
+
+  document.getElementById('rpt-lbl').textContent = lbl;
+
+  const total   = list.length;
+  const totDur  = list.reduce((s,r)=>s+(r.duration||0), 0);
+  const avgDur  = total ? Math.round(totDur/total) : 0;
+  const officers= [...new Set(list.filter(r=>r.officer).map(r=>r.officer))];
+
+  // Count helpers
+  const bySvc  = Object.fromEntries(SERVICES.map(s=>[s.id, 0]));
+  const byCh   = Object.fromEntries(CHANNELS.map(c=>[c.id, 0]));
+  const byOff  = {};
+  list.forEach(r=>{
+    if(r.qType)   bySvc[r.qType]   = (bySvc[r.qType]||0)+1;
+    if(r.channel) byCh[r.channel]  = (byCh[r.channel]||0)+1;
+    if(r.officer) byOff[r.officer] = (byOff[r.officer]||0)+1;
+  });
+
+  const maxSvc = Math.max(1,...Object.values(bySvc));
+  const maxCh  = Math.max(1,...Object.values(byCh));
+  const maxOff = Math.max(1,...Object.values(byOff));
+
+  // Daily breakdown (for weekly/monthly)
+  const byDate = {};
+  list.forEach(r=>{ byDate[r.date]=(byDate[r.date]||0)+1; });
+  const dateRows = Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0]));
+  const maxDate  = Math.max(1,...Object.values(byDate));
+
+  document.getElementById('rpt-content').innerHTML = `
+    <!-- KPI -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val" style="color:#1d4ed8">${total}</div>
+        <div class="stat-lbl">จำนวนรายการ</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#059669">${avgDur}</div>
+        <div class="stat-lbl">เฉลี่ยต่อครั้ง (นาที)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#b45309">${totDur}</div>
+        <div class="stat-lbl">รวมเวลาทั้งหมด (นาที)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#7c3aed">${officers.length}</div>
+        <div class="stat-lbl">เจ้าหน้าที่ที่ให้บริการ</div>
+      </div>
+    </div>
+
+    <!-- By Service -->
+    <div class="chart-box">
+      <div class="chart-ttl">📦 จำแนกตามประเภทบริการ</div>
+      ${SERVICES.map(s=>{
+        const n=bySvc[s.id]||0, p=Math.round(n/maxSvc*100);
+        return `<div class="bar-row">
+          <div class="bar-lbl">${s.icon} ${s.name}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${p}%;background:${s.color}">${n>0?n:''}</div>
+          </div>
+          <div class="bar-n">${n}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- By Channel -->
+    <div class="chart-box">
+      <div class="chart-ttl">📡 จำแนกตามช่องทางการให้บริการ</div>
+      ${CHANNELS.map(c=>{
+        const n=byCh[c.id]||0, p=Math.round(n/maxCh*100);
+        const clr=CH_TXTCL[c.id]||'#374151';
+        return `<div class="bar-row">
+          <div class="bar-lbl">${c.icon} ${c.name}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${p}%;background:${clr}">${n>0?n:''}</div>
+          </div>
+          <div class="bar-n">${n}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- By Officer -->
+    <div class="chart-box">
+      <div class="chart-ttl">👤 จำแนกตามเจ้าหน้าที่</div>
+      ${Object.entries(byOff).sort((a,b)=>b[1]-a[1]).map(([nm,n])=>{
+        const p=Math.round(n/maxOff*100);
+        return `<div class="bar-row">
+          <div class="bar-lbl">👤 ${esc(nm)}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${p}%;background:#1d4ed8">${n>0?n:''}</div>
+          </div>
+          <div class="bar-n">${n}</div>
+        </div>`;
+      }).join('') || '<div style="color:#9ca3af;font-size:.84rem">ไม่มีข้อมูล</div>'}
+    </div>
+
+    ${dateRows.length>1?`
+    <!-- By Date -->
+    <div class="chart-box">
+      <div class="chart-ttl">📅 จำนวนรายการแยกตามวัน</div>
+      ${dateRows.map(([dt,n])=>{
+        const p=Math.round(n/maxDate*100);
+        return `<div class="bar-row">
+          <div class="bar-lbl">${dateTH(dt)}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${p}%;background:#0f766e">${n>0?n:''}</div>
+          </div>
+          <div class="bar-n">${n}</div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+
+    <!-- Detail Table -->
+    <div class="chart-box">
+      <div class="chart-ttl">📋 รายการทั้งหมดในช่วงนี้ (${total} รายการ)</div>
+      ${!list.length
+        ? '<div style="color:#9ca3af;text-align:center;padding:20px">ไม่มีข้อมูลในช่วงเวลานี้</div>'
+        : `<div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>#</th><th>วันที่</th><th>คิว</th><th>เวลา</th>
+                <th>ระยะเวลา</th><th>ผู้รับบริการ</th><th>หน่วยงาน</th>
+                <th>ช่องทาง</th><th>คำถาม</th><th>เจ้าหน้าที่</th>
+              </tr></thead>
+              <tbody>
+                ${[...list].sort((a,b)=>a.date.localeCompare(b.date)||(a.tStart||'').localeCompare(b.tStart||'')).map((r,i)=>{
+                  const svc=SERVICES.find(s=>s.id===r.qType);
+                  const ch =CHANNELS.find(c=>c.id===r.channel);
+                  return `<tr>
+                    <td>${i+1}</td>
+                    <td style="white-space:nowrap">${dateTH(r.date)}</td>
+                    <td><span class="badge" style="background:${svc?.bg||'#f3f4f6'};color:${svc?.color||'#374151'}">${svc?.icon||''} ${esc(r.queue)||'—'}</span></td>
+                    <td style="white-space:nowrap;font-size:.8rem">${r.tStart||''}${r.tEnd?' – '+r.tEnd:''}</td>
+                    <td style="white-space:nowrap">${r.duration!=null?r.duration+' น.':'—'}</td>
+                    <td>${esc(r.name)}</td>
+                    <td class="td-trunc">${esc(r.agency)||'—'}</td>
+                    <td><span class="badge" style="background:${CH_COLOR[r.channel]||'#f3f4f6'};color:${CH_TXTCL[r.channel]||'#374151'}">${chDisplay(r)}</span></td>
+                    <td class="td-trunc" title="${esc(r.question)}">${esc(r.question)}</td>
+                    <td style="white-space:nowrap">${esc(r.officer)}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>`
+      }
+    </div>
+  `;
+}
+
+/* ══════════════════════════════════════════════
+   STAFF MANAGEMENT
+══════════════════════════════════════════════ */
+function addStaff() {
+  const nm = document.getElementById('staff-in').value.trim();
+  if(!nm) return;
+  if(staff.includes(nm)) { toast('⚠️ มีชื่อนี้อยู่แล้ว'); return; }
+  staff.push(nm);
+  saveStaff();
+  document.getElementById('staff-in').value = '';
+  buildStaffList();
+  buildOfficerSelect();
+  toast('✅ เพิ่มเจ้าหน้าที่แล้ว');
+}
+
+function removeStaff(i) {
+  staff.splice(i,1);
+  saveStaff();
+  buildStaffList();
+  buildOfficerSelect();
+}
+
+/* ══════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════ */
+function saveConfig() {
+  cfg.office   = document.getElementById('cfg-office').value.trim();
+  cfg.province = document.getElementById('cfg-province').value.trim();
+  localStorage.setItem('cgd_cfg', JSON.stringify(cfg));
+  toast('✅ บันทึกข้อมูลหน่วยงานแล้ว');
+}
+
+/* ══════════════════════════════════════════════
+   EXPORT / IMPORT
+══════════════════════════════════════════════ */
+function exportCSV() {
+  const hdr = ['วันที่','คิว','ประเภทบริการ','เวลาเริ่มต้น','เวลาสิ้นสุด','ระยะเวลา(นาที)',
+    'ชื่อผู้รับบริการ','หน่วยงาน','ช่องทาง','คำถาม','คำตอบ','เจ้าหน้าที่'];
+  const rows = records.map(r => {
+    const svc=SERVICES.find(s=>s.id===r.qType);
+    const chName = r.channel==='other'
+      ? (r.channelOther||'อื่นๆ')
+      : (CHANNELS.find(c=>c.id===r.channel)?.name||r.channel);
+    return [r.date, r.queue, svc?.name||'', r.tStart, r.tEnd, r.duration,
+      r.name, r.agency, chName, r.question, r.answer, r.officer]
+      .map(v=>`"${(v??'').toString().replace(/"/g,'""')}"`);
+  });
+  const csv = [hdr.join(','),...rows.map(r=>r.join(','))].join('\r\n');
+  dl('\uFEFF'+csv, `service_${isoDate(new Date())}.csv`, 'text/csv;charset=utf-8');
+  toast('📥 Export CSV เรียบร้อย');
+}
+
+function exportJSON() {
+  dl(JSON.stringify({records, staff, cfg, exportedAt:new Date().toISOString()},null,2),
+    `service_${isoDate(new Date())}.json`, 'application/json');
+  toast('📤 Export JSON เรียบร้อย');
+}
+
+function importJSON(ev) {
+  const f = ev.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(data.records) {
+        const merge = confirm(
+          `พบ ${data.records.length} รายการ\nรวมกับข้อมูลปัจจุบัน (${records.length} รายการ) หรือไม่?\nOK = รวม  |  Cancel = แทนที่`
+        );
+        if(merge) {
+          const ex=new Set(records.map(r=>r.id));
+          records=[...records,...data.records.filter(r=>!ex.has(r.id))];
+        } else {
+          records=data.records;
+        }
+        saveRecs(); renderRecords(); renderReport();
+        toast(`✅ Import สำเร็จ รวม ${records.length} รายการ`);
+      }
+    } catch { toast('❌ ไฟล์ไม่ถูกต้อง'); }
+  };
+  rd.readAsText(f);
+  ev.target.value='';
+}
+
+function clearAll() {
+  if(!confirm('ยืนยันการล้างข้อมูลทั้งหมด?\nการกระทำนี้ไม่สามารถยกเลิกได้')) return;
+  records=[];
+  saveRecs(); renderRecords(); renderReport();
+  toast('🗑️ ล้างข้อมูลทั้งหมดแล้ว');
+}
+
+function updateCounts() {
+  document.getElementById('total-lbl').textContent = records.length;
+  document.getElementById('staff-lbl').textContent = staff.length;
+}
+
+/* ══════════════════════════════════════════════
+   GOOGLE APPS SCRIPT
+══════════════════════════════════════════════ */
+function saveGasUrl() {
+  gasUrl = document.getElementById('gas-url-in').value.trim();
+  localStorage.setItem('cgd_gas_url', gasUrl);
+  updateSyncBadge();
+  toast(gasUrl ? '✅ บันทึก URL Google Sheets แล้ว' : '🔌 ยกเลิกการเชื่อมต่อ Cloud');
+}
+
+async function testGas() {
+  const url = document.getElementById('gas-url-in').value.trim();
+  if(!url) { toast('⚠️ กรุณาใส่ URL ก่อน'); return; }
+  toast('🔄 กำลังทดสอบการเชื่อมต่อ...');
+  try {
+    await fetch(url+'?action=ping',{mode:'no-cors'});
+    toast('✅ เชื่อมต่อได้ (no-cors mode)');
+  } catch(err) {
+    toast('❌ เชื่อมต่อไม่ได้: '+err.message);
+  }
+}
+
+async function postGas(rec) {
+  if(!gasUrl) return;
+  try {
+    await fetch(gasUrl,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'addRecord',...rec}),
+    });
+  } catch(err) { console.warn('GAS sync error:',err); }
+}
+
+function updateSyncBadge() {
+  const b = document.getElementById('sync-badge');
+  if(gasUrl) {
+    b.className='sync-badge sb-on';
+    b.innerHTML='<span class="dot dot-g"></span> เชื่อมต่อ Google Sheets';
+  } else {
+    b.className='sync-badge sb-off';
+    b.innerHTML='<span class="dot dot-gr"></span> ออฟไลน์ (Local Storage)';
+  }
+}
+
+function copyGasCode() {
+  navigator.clipboard.writeText(document.getElementById('gas-code-pre').textContent)
+    .then(()=>toast('📋 คัดลอกโค้ดแล้ว'))
+    .catch(()=>toast('❌ ไม่สามารถคัดลอกได้'));
+}
+
+function gasCode() {
+return `// ===================================================
+// Google Apps Script — ระบบบันทึกการให้บริการ CGD
+// สำนักงานคลังจังหวัด · กรมบัญชีกลาง
+// วางโค้ดนี้ใน Extensions → Apps Script
+// Deploy → New Deployment → Web App
+// Execute as: Me | Who has access: Anyone
+// ===================================================
+
+const SHEET_NAME = 'ServiceLog';
+const HEADERS = [
+  'ID','วันที่','คิว','ประเภทบริการ','เวลาเริ่มต้น','เวลาสิ้นสุด',
+  'ระยะเวลา(นาที)','ชื่อผู้รับบริการ','หน่วยงาน','ช่องทาง',
+  'คำถาม','คำตอบ','เจ้าหน้าที่','บันทึกเมื่อ'
+];
+
+function getOrCreateSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SHEET_NAME);
+  if (!sh) {
+    sh = ss.insertSheet(SHEET_NAME);
+    sh.appendRow(HEADERS);
+    sh.getRange(1,1,1,HEADERS.length)
+      .setBackground('#1e3a8a').setFontColor('#ffffff')
+      .setFontWeight('bold');
+  }
+  return sh;
+}
+
+function doPost(e) {
+  try {
+    const d = JSON.parse(e.postData.contents);
+    if (d.action === 'addRecord') {
+      const sh = getOrCreateSheet();
+      sh.appendRow([
+        d.id, d.date, d.queue, d.qType,
+        d.tStart, d.tEnd, d.duration,
+        d.name, d.agency, d.channel,
+        d.question, d.answer, d.officer, d.ts
+      ]);
+    }
+    return resp({status:'ok'});
+  } catch(err) {
+    return resp({status:'error', message:err.message});
+  }
+}
+
+function doGet(e) {
+  const action = e.parameter.action;
+  if (action === 'ping') return resp({status:'ok',message:'CGD Service Log API ready'});
+
+  const sh = getOrCreateSheet();
+  const rows = sh.getDataRange().getValues();
+  const hdrs = rows[0];
+  const records = rows.slice(1).map(row => {
+    const obj = {};
+    hdrs.forEach((h,i) => obj[h] = row[i]);
+    return obj;
+  });
+  return resp({status:'ok', count:records.length, records});
+}
+
+function resp(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+}
+
+/* ══════════════════════════════════════════════
+   TAB NAVIGATION
+══════════════════════════════════════════════ */
+function showTab(btn, id) {
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='records') renderRecords();
+  if(id==='report')  renderReport();
+  if(id==='settings'){ updateCounts(); buildStaffList(); }
+}
+
+/* ══════════════════════════════════════════════
+   CHANNEL DISPLAY HELPER
+══════════════════════════════════════════════ */
+function chDisplay(r) {
+  const ch = CHANNELS.find(c=>c.id===r.channel);
+  if(!ch) return r.channel||'—';
+  if(r.channel === 'other') return `✏️ ${r.channelOther||'อื่นๆ'}`;
+  return `${ch.icon} ${ch.name}`;
+}
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+function isoDate(d) { return d.toISOString().split('T')[0]; }
+
+function hhmm(d) { return d.toTimeString().slice(0,5); }
+
+function dateTH(iso) {
+  if(!iso) return '—';
+  const [y,m,dd] = iso.split('-').map(Number);
+  const M=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.',
+           'ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${dd} ${M[m]} ${y+543}`;
+}
+
+function weekStart(d) {
+  const c=new Date(d);
+  const day=c.getDay()||7;
+  c.setDate(c.getDate()-day+1);
+  c.setHours(0,0,0,0);
+  return c;
+}
+
+function esc(s) {
+  if(!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function dl(content, name, type) {
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=name; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function toast(msg, ms=3200) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+function highlight(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.borderColor = '#ef4444';
+  el.style.boxShadow  = '0 0 0 3px rgba(239,68,68,.18)';
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
+  el.focus();
+  setTimeout(() => {
+    el.style.borderColor = '';
+    el.style.boxShadow   = '';
+  }, 2500);
+}
+
+/* ══ START ══ */
+init();
+</script>
+</body>
+</html>
