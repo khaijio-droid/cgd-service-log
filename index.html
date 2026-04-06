@@ -210,15 +210,32 @@ tbody tr:last-child td{border-bottom:none}
 
 /* ── PRINT ── */
 @media print{
+  /* บังคับพิมพ์สีพื้นหลังและรูปภาพ (สำคัญมากสำหรับกราฟ) */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+
   /* ซ่อนทุกอย่างยกเว้นเนื้อหารายงาน */
   header,.tab-bar,.toolbar,.rpt-nav,.period-nav,.btn-submit,
   .btn,.modal-ov,#toast,.set-card,
   #tab-form,#tab-records,#tab-settings{display:none!important}
+
   /* แสดงเฉพาะ tab รายงานสรุป */
   #tab-report{display:block!important;padding:0}
   body{background:#fff}
+
+  /* กราฟ — ไม่มี shadow, transition */
+  .chart-box{box-shadow:none;border:1px solid #e5e7eb;break-inside:avoid;margin-bottom:12px}
+  .bar-fill{transition:none!important}
+  .bar-track{background:#f3f4f6!important}
+
+  /* ตัวเลขสรุป */
+  .stat-card{box-shadow:none;border:1px solid #e5e7eb}
+
+  /* ตาราง */
   table{box-shadow:none}
   .form-card,.rpt-card{box-shadow:none;border:1px solid #e5e7eb}
+
+  /* ไม่ตัดหน้าในกลางแถวตาราง */
+  tr{break-inside:avoid}
 }
 </style>
 </head>
@@ -540,6 +557,14 @@ tbody tr:last-child td{border-bottom:none}
   <!-- จัดการข้อมูล -->
   <div class="set-card">
     <div class="set-ttl">💾 จัดการข้อมูล</div>
+    <!-- อัปโหลดข้อมูลเก่าขึ้น Cloud -->
+    <div class="info-box" style="margin-bottom:12px;background:#fef3c7;border-color:#fcd34d;color:#78350f">
+      ☁️ <strong>ข้อมูลที่บันทึกก่อนตั้งค่า Cloud</strong> จะอยู่ในเครื่องเท่านั้น
+      กดปุ่มด้านล่างเพื่ออัปโหลดทั้งหมดขึ้น Google Sheets
+    </div>
+    <button class="btn btn-blue" onclick="pushAllToCloud()" style="margin-bottom:14px;width:100%">
+      ☁️ อัปโหลดข้อมูลทั้งหมดในเครื่องขึ้น Cloud
+    </button>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
       <button class="btn btn-green" onclick="exportCSV()">📥 Export CSV</button>
       <button class="btn btn-blue"  onclick="exportJSON()">📤 Export JSON</button>
@@ -1287,6 +1312,41 @@ function saveConfig() {
   cfg.province = document.getElementById('cfg-province').value.trim();
   localStorage.setItem('cgd_cfg', JSON.stringify(cfg));
   toast('✅ บันทึกข้อมูลหน่วยงานแล้ว');
+}
+
+/* ══════════════════════════════════════════════
+   PUSH ALL LOCAL → CLOUD
+══════════════════════════════════════════════ */
+async function pushAllToCloud() {
+  if(!gasUrl) {
+    toast('⚠️ ยังไม่ได้ตั้งค่า GAS URL — ไปที่ ⚙️ ตั้งค่า');
+    return;
+  }
+  if(records.length === 0) {
+    toast('ℹ️ ไม่มีข้อมูลในเครื่อง');
+    return;
+  }
+  if(!confirm(`จะอัปโหลด ${records.length} รายการขึ้น Google Sheets ใช่หรือไม่?\n(ระบบจะข้ามรายการที่มีอยู่แล้วใน Sheet โดยอัตโนมัติ)`)) return;
+
+  toast('☁️ กำลังอัปโหลด...');
+  let ok = 0, dup = 0, fail = 0;
+
+  for(const rec of records) {
+    try {
+      await fetch(gasUrl, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'addRecord', ...rec}),
+      });
+      ok++;
+    } catch(e) {
+      fail++;
+    }
+    // หน่วงเล็กน้อยไม่ให้ request ชนกัน
+    await new Promise(r => setTimeout(r, 120));
+  }
+
+  toast(`✅ อัปโหลดเสร็จ ${ok} รายการ${fail ? ` · ล้มเหลว ${fail} รายการ` : ''} — กด Sync เพื่อตรวจสอบ`);
 }
 
 /* ══════════════════════════════════════════════
