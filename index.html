@@ -269,6 +269,7 @@ tbody tr:last-child td{border-bottom:none}
     </span>
     <span id="sync-last-lbl">ยังไม่เคย Sync</span>
     <span id="sync-count-lbl" style="color:var(--primary);font-weight:600"></span>
+    <span id="auto-sync-lbl" style="color:#059669;font-size:.78rem;font-weight:600"></span>
   </div>
   <button class="btn-sync" id="sync-btn" onclick="manualSync()" title="ดึงข้อมูลจากทุกเครื่องมารวมกัน">
     🔄 Sync ข้อมูล
@@ -1419,7 +1420,8 @@ function saveGasUrl() {
   gasUrl = document.getElementById('gas-url-in').value.trim();
   localStorage.setItem('cgd_gas_url', gasUrl);
   updateSyncBadge();
-  if(gasUrl) { syncFromGAS(); }
+  if(gasUrl) { syncFromGAS(); startAutoSync(); }
+  else { stopAutoSync(); }
   toast(gasUrl ? '✅ บันทึก URL แล้ว กำลัง Sync...' : '🔌 ยกเลิกการเชื่อมต่อ Cloud');
 }
 
@@ -1520,7 +1522,8 @@ function saveSheetId() {
   sheetId = document.getElementById('gas-sheet-id-in').value.trim();
   localStorage.setItem('cgd_sheet_id', sheetId);
   updateSyncBadge();
-  if(sheetId) { syncFromGAS(); }
+  if(sheetId) { syncFromGAS(); startAutoSync(); }
+  else if(!gasUrl) { stopAutoSync(); }
   toast(sheetId ? '✅ บันทึก Sheet ID แล้ว กำลัง Sync...' : '🔌 ยกเลิก Sheet ID');
 }
 
@@ -1903,6 +1906,45 @@ showNotice();
 if(gasUrl || sheetId) {
   setTimeout(() => syncFromGAS(), 800);
 }
+
+/* ══════════════════════════════════════════════
+   AUTO-SYNC ทุก 2 นาที (120,000 ms)
+══════════════════════════════════════════════ */
+const AUTO_SYNC_INTERVAL = 2 * 60 * 1000; // 2 นาที
+let autoSyncTimer = null;
+let nextSyncAt    = null;
+
+function startAutoSync() {
+  stopAutoSync();
+  if(!gasUrl && !sheetId) return;
+  nextSyncAt = Date.now() + AUTO_SYNC_INTERVAL;
+  updateAutoSyncLabel();
+  autoSyncTimer = setInterval(async () => {
+    await syncFromGAS();
+    nextSyncAt = Date.now() + AUTO_SYNC_INTERVAL;
+  }, AUTO_SYNC_INTERVAL);
+}
+
+function stopAutoSync() {
+  if(autoSyncTimer) { clearInterval(autoSyncTimer); autoSyncTimer = null; }
+  nextSyncAt = null;
+}
+
+function updateAutoSyncLabel() {
+  const el = document.getElementById('auto-sync-lbl');
+  if(!el) return;
+  if(!autoSyncTimer) { el.textContent = ''; return; }
+  const sec = Math.max(0, Math.round((nextSyncAt - Date.now()) / 1000));
+  const mm  = String(Math.floor(sec / 60)).padStart(2,'0');
+  const ss  = String(sec % 60).padStart(2,'0');
+  el.textContent = `🔁 Auto-sync ใน ${mm}:${ss}`;
+}
+
+// อัปเดต label ทุกวินาที
+setInterval(updateAutoSyncLabel, 1000);
+
+// เริ่ม auto-sync
+startAutoSync();
 </script>
 </body>
 </html>
