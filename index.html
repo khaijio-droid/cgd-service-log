@@ -1458,9 +1458,10 @@ async function readFromGviz(sid) {
   const resp = await fetch(url);
   if(!resp.ok) throw new Error('HTTP '+resp.status);
   const text = await resp.text();
-  // ลอก JSONP wrapper: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
-  const clean = text.replace(/^[^\[{]*/, '').replace(/\s*\);\s*$/, '');
-  const json  = JSON.parse(clean);
+  // แกะ JSONP: google.visualization.Query.setResponse({...});
+  const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\)\s*;?\s*$/);
+  if(!match) throw new Error('gviz: รูปแบบ response ผิดปกติ — ตรวจสอบว่า Sheet แชร์เป็น Public แล้ว');
+  const json  = JSON.parse(match[1]);
   const table = json.table;
   if(!table || !table.cols || !table.rows) return [];
   const cols = table.cols.map(c => c.label || c.id);
@@ -1513,7 +1514,11 @@ async function syncFromGAS() {
   } catch(err) {
     console.warn('Sync error:', err);
     setSyncState('error');
-    toast('⚠️ Sync ไม่สำเร็จ: '+err.message);
+    let msg = err.message;
+    if(msg.includes('Failed to fetch'))   msg = 'เชื่อมต่อไม่ได้ — ตรวจสอบ Internet และการแชร์ Sheet';
+    if(msg.includes('Public'))            msg = 'Sheet ยังไม่ได้แชร์เป็น Public — Share → Anyone with link → Viewer';
+    if(msg.includes('HTTP 4'))            msg = 'Sheet ID ไม่ถูกต้อง หรือ Sheet ไม่ได้แชร์';
+    toast('⚠️ Sync ไม่สำเร็จ: ' + msg);
   }
 }
 
@@ -1714,7 +1719,13 @@ function _openTab(btn, id) {
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
   if(id==='records') { buildOfficerFilter(); renderRecords(); }
-  if(id==='report')  renderReport();
+  if(id==='report') {
+    renderReport(); // แสดงข้อมูลเดิมก่อนทันที
+    if(gasUrl || sheetId) {
+      // sync จาก Cloud แล้ว render ใหม่ → ทุกคนเห็นข้อมูลเดียวกัน
+      syncFromGAS().then(() => renderReport());
+    }
+  }
   if(id==='settings'){ updateCounts(); buildStaffList(); }
 }
 
