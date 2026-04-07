@@ -756,8 +756,12 @@ function loadData() {
     "นางสาวดลยา พันธ์นาม",
     "นายภุชงค์ ลครวงษ์"
   ]));
-  gasUrl  = localStorage.getItem('cgd_gas_url')   || '';
-  sheetId = localStorage.getItem('cgd_sheet_id')  || '';
+  // ค่าเริ่มต้น (DEFAULT) — ฝังไว้ให้เครื่องใหม่ใช้งานได้ทันทีโดยไม่ต้องตั้งค่า
+  // หากต้องการเปลี่ยน ให้ไปที่ ⚙️ ตั้งค่า แล้วกรอกค่าใหม่ → กดบันทึก (จะเขียนทับค่านี้)
+  const DEFAULT_GAS_URL  = 'https://script.google.com/macros/s/AKfycbyRGJs6eUeJiOxp3x9M8V1ce8Dtm23l3h71Fvnw4Un8jIM_GiqicNYnrzPetuZQ9FO86g/exec';
+  const DEFAULT_SHEET_ID = '1YExLlWr0VJQ2nT88aJPHI3nOF2WstRLTeSFmTl8USjI';
+  gasUrl  = localStorage.getItem('cgd_gas_url')   || DEFAULT_GAS_URL;
+  sheetId = localStorage.getItem('cgd_sheet_id')  || DEFAULT_SHEET_ID;
   cfg     = JSON.parse(localStorage.getItem('cgd_cfg') || '{"office":"สำนักงานคลังจังหวัดอำนาจเจริญ","province":"อำนาจเจริญ"}');
 }
 
