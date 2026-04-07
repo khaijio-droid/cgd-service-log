@@ -1794,10 +1794,12 @@ async function testGas() {
 async function postGas(rec) {
   if(!gasUrl) return;
   try {
+    const form = new FormData();
+    form.append('data', JSON.stringify({action:'addRecord', ...rec}));
     await fetch(gasUrl, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'addRecord', ...rec}),
+      method:'POST',
+      mode:'no-cors',
+      body: form,
     });
   } catch(err) { console.warn('GAS post error:', err); }
 }
