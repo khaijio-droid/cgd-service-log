@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<!-- saved from url=(0182)file:///C:/Users/SANIT%20H/Desktop/New%20folder%20(2)/%E0%B8%A3%E0%B8%B0%E0%B8%9A%E0%B8%9A%E0%B9%83%E0%B8%AB%E0%B9%89%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%81%E0%B8%B2%E0%B8%A3/index.html -->
-<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>บันทึกการให้บริการ/ให้คำปรึกษา — สำนักงานคลังจังหวัดอำนาจเจริญ</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -250,62 +250,68 @@ tbody tr:last-child td{border-bottom:none}
       <div class="hd-sub">ระบบบันทึกการให้บริการ/ให้คำปรึกษา · กรมบัญชีกลาง</div>
     </div>
   </div>
-  <div id="clock">06:14:15</div>
+  <div id="clock">--:--:--</div>
 </header>
 
 <!-- ══ TABS ══ -->
 <div class="tab-bar">
-  <button class="tab-btn" data-tab="form" onclick="showTab(this,&#39;form&#39;)">📝 บันทึกบริการ</button>
-  <button class="tab-btn" data-tab="records" onclick="showTab(this,&#39;records&#39;)">📋 รายการบริการ</button>
-  <button class="tab-btn" data-tab="report" onclick="showTab(this,&#39;report&#39;)">📊 รายงานสรุป</button>
-  <button class="tab-btn active" data-tab="settings" onclick="showTab(this,&#39;settings&#39;)">⚙️ ตั้งค่า</button>
+  <button class="tab-btn active" data-tab="form"    onclick="showTab(this,'form')">📝 บันทึกบริการ</button>
+  <button class="tab-btn"        data-tab="records" onclick="showTab(this,'records')">📋 รายการบริการ</button>
+  <button class="tab-btn"        data-tab="report"  onclick="showTab(this,'report')">📊 รายงานสรุป</button>
+  <button class="tab-btn"        data-tab="settings"onclick="showTab(this,'settings')">⚙️ ตั้งค่า</button>
 </div>
 
 <!-- ══ SYNC BAR ══ -->
 <div class="sync-bar" id="sync-bar">
   <div class="sync-info">
-    <span id="sync-badge" class="sync-badge sb-on"><span class="dot dot-g"></span> Cloud (Google Sheets · gviz)</span>
-    <span id="sync-last-lbl">❌ Sync ล้มเหลว — ตรวจสอบการเชื่อมต่อ</span>
-    <span id="sync-count-lbl" style="color:var(--primary);font-weight:600">(2 รายการ)</span>
-    <span id="auto-sync-lbl" style="color:#059669;font-size:.78rem;font-weight:600">🔁 Auto-sync ใน 00:47</span>
+    <span id="sync-badge" class="sync-badge sb-off">
+      <span class="dot dot-gr"></span> ออฟไลน์
+    </span>
+    <span id="sync-last-lbl">ยังไม่เคย Sync</span>
+    <span id="sync-count-lbl" style="color:var(--primary);font-weight:600"></span>
+    <span id="auto-sync-lbl" style="color:#059669;font-size:.78rem;font-weight:600"></span>
   </div>
-  <button class="btn-sync" id="sync-btn" onclick="manualSync()" title="ดึงข้อมูลจากทุกเครื่องมารวมกัน">🔄 Sync ข้อมูล</button>
+  <button class="btn-sync" id="sync-btn" onclick="manualSync()" title="ดึงข้อมูลจากทุกเครื่องมารวมกัน">
+    🔄 Sync ข้อมูล
+  </button>
 </div>
 
 <!-- ══ TAB 1: FORM ══ -->
-<div class="tab-pane" id="tab-form">
+<div class="tab-pane active" id="tab-form">
   <div class="form-card">
     <div class="form-title">📝 บันทึกการให้บริการ / ให้คำปรึกษา</div>
-    <form id="svc-form" onsubmit="submitForm(event)" novalidate="">
+    <form id="svc-form" onsubmit="submitForm(event)" novalidate>
       <div class="form-grid">
 
         <!-- วันที่ -->
         <div class="form-group">
           <label>วันที่<span class="req">*</span></label>
-          <input type="date" id="f-date" required="">
+          <input type="date" id="f-date" required/>
         </div>
 
         <!-- คิวบริการ -->
         <div class="form-group">
-          <label>คิวบริการ (ประเภท + หมายเลข)<span class="req">*</span></label>
+          <label id="qnum-label">คิวบริการ (ประเภท + หมายเลข)<span class="req">*</span>
+            <span id="qnum-hint" style="font-weight:400;color:#6b7280;font-size:.8rem"> — กรอกเฉพาะมารับบริการที่สำนักงาน</span>
+          </label>
           <div class="queue-row">
             <select id="f-qtype" onchange="onQueueTypeChange()" style="min-width:0;flex:2">
               <option value="">-- ประเภทบริการ --</option>
-            <option value="proc">📦 จ  –  จัดซื้อจัดจ้าง</option><option value="law">⚖️ ก  –  กฎหมายระเบียบการเงินการคลัง</option><option value="gfm">💻 G  –  GFMIS</option><option value="eco">📈 ศ  –  เศรษฐกิจ</option><option value="pen">🏅 บ  –  บำเหน็จบำนาญ</option><option value="wel">🤝 ส  –  งานสวัสดิการแห่งรัฐ</option></select>
-            <input type="text" id="f-qnum" placeholder="เช่น 001" maxlength="6" style="flex:1;min-width:80px">
+            </select>
+            <input type="text" id="f-qnum" placeholder="เช่น 001" maxlength="6" style="flex:1;min-width:80px"/>
           </div>
         </div>
 
         <!-- เวลาเริ่มต้น -->
         <div class="form-group">
           <label>เวลาเริ่มต้น<span class="req">*</span></label>
-          <input type="time" id="f-tstart" required="" onchange="calcDur()">
+          <input type="time" id="f-tstart" required onchange="calcDur()"/>
         </div>
 
         <!-- เวลาสิ้นสุด -->
         <div class="form-group">
           <label>เวลาสิ้นสุด<span class="req">*</span></label>
-          <input type="time" id="f-tend" onchange="calcDur()">
+          <input type="time" id="f-tend" onchange="calcDur()"/>
         </div>
 
         <!-- ระยะเวลา -->
@@ -317,45 +323,37 @@ tbody tr:last-child td{border-bottom:none}
         <!-- ชื่อผู้รับบริการ -->
         <div class="form-group">
           <label>ชื่อผู้รับบริการ<span class="req">*</span></label>
-          <input type="text" id="f-name" placeholder="ชื่อ-นามสกุล" required="">
+          <input type="text" id="f-name" placeholder="ชื่อ-นามสกุล" required/>
         </div>
 
         <!-- หน่วยงาน -->
         <div class="form-group">
           <label>หน่วยงาน / ประชาชนทั่วไป<span class="req">*</span></label>
-          <input type="text" id="f-agency" placeholder="ชื่อหน่วยงาน หรือ ประชาชน">
+          <input type="text" id="f-agency" placeholder="ชื่อหน่วยงาน หรือ ประชาชน"/>
         </div>
 
         <!-- เจ้าหน้าที่ -->
         <div class="form-group">
           <label>เจ้าหน้าที่ผู้ให้บริการ<span class="req">*</span></label>
-          <select id="f-officer" required=""><option value="">-- เลือกเจ้าหน้าที่ --</option><option value="นางนิภาพรรณ เหล่าแค">นางนิภาพรรณ เหล่าแค</option><option value="นายณัฏฐ์กิตต์ วิเศษรัตน์">นายณัฏฐ์กิตต์ วิเศษรัตน์</option><option value="นายพงศกร แสวงหา">นายพงศกร แสวงหา</option><option value="นางศุภรัตน์ วรรณโท">นางศุภรัตน์ วรรณโท</option><option value="นายพรพิพัฒน์ เหมคุณ">นายพรพิพัฒน์ เหมคุณ</option><option value="นายพีระยุทธ์ เชื้อสุข">นายพีระยุทธ์ เชื้อสุข</option><option value="นางสาวธีรภัทร์ มาศขาว">นางสาวธีรภัทร์ มาศขาว</option><option value="นายสานิตย์ สารพันธ์">นายสานิตย์ สารพันธ์</option><option value="นางสาววิไลรัตน์ เวชกามา">นางสาววิไลรัตน์ เวชกามา</option><option value="นางสาวกรภัทร์ สุขโน">นางสาวกรภัทร์ สุขโน</option><option value="นางสาวอนุชสรา ช่วยมิตร">นางสาวอนุชสรา ช่วยมิตร</option><option value="นางสาวชนิตรา จันทร์สว่าง">นางสาวชนิตรา จันทร์สว่าง</option><option value="นายบดินทร์ โพธิมะโน">นายบดินทร์ โพธิมะโน</option><option value="นางสาวอัฐพร คำบุรมย์">นางสาวอัฐพร คำบุรมย์</option><option value="นางสาวสุภาพร วรรณภูมิ">นางสาวสุภาพร วรรณภูมิ</option><option value="นางสาวรัตนา วารินทร์">นางสาวรัตนา วารินทร์</option><option value="นางสาวดลยา พันธ์นาม">นางสาวดลยา พันธ์นาม</option><option value="นายภุชงค์ ลครวงษ์">นายภุชงค์ ลครวงษ์</option></select>
+          <select id="f-officer" required>
+            <option value="">-- เลือกเจ้าหน้าที่ --</option>
+          </select>
         </div>
 
         <!-- ช่องทาง (full width) -->
         <div class="form-group full">
           <label>ช่องทางการให้บริการ / ให้คำปรึกษา<span class="req">*</span></label>
-          <div class="channel-grid" id="ch-grid"><button type="button" class="ch-btn" data-id="walkin" onclick="pickChannel(&#39;walkin&#39;)">
-      🏢 ติดต่อด้วยตนเอง ณ สำนักงาน
-    </button><button type="button" class="ch-btn" data-id="line" onclick="pickChannel(&#39;line&#39;)">
-      💚 Line
-    </button><button type="button" class="ch-btn" data-id="fb" onclick="pickChannel(&#39;fb&#39;)">
-      💙 Facebook
-    </button><button type="button" class="ch-btn" data-id="phone" onclick="pickChannel(&#39;phone&#39;)">
-      📞 โทรศัพท์
-    </button><button type="button" class="ch-btn" data-id="other" onclick="pickChannel(&#39;other&#39;)">
-      ✏️ อื่นๆ (ระบุ)
-    </button></div>
-          <input type="hidden" id="f-channel">
+          <div class="channel-grid" id="ch-grid"></div>
+          <input type="hidden" id="f-channel"/>
           <div id="ch-other-wrap" style="display:none;margin-top:10px">
-            <input type="text" id="f-channel-other" placeholder="ระบุช่องทางการให้บริการ เช่น อีเมล, Line Official, ประชุมออนไลน์ ฯลฯ">
+            <input type="text" id="f-channel-other" placeholder="ระบุช่องทางการให้บริการ เช่น อีเมล, Line Official, ประชุมออนไลน์ ฯลฯ"/>
           </div>
         </div>
 
         <!-- คำถาม (full width) -->
         <div class="form-group full">
           <label>คำถามที่ขอรับบริการ / ปรึกษา<span class="req">*</span></label>
-          <textarea id="f-question" placeholder="ระบุเรื่อง/คำถามที่ผู้รับบริการต้องการ..." rows="3" required=""></textarea>
+          <textarea id="f-question" placeholder="ระบุเรื่อง/คำถามที่ผู้รับบริการต้องการ..." rows="3" required></textarea>
         </div>
 
         <!-- คำตอบ (full width) -->
@@ -373,7 +371,7 @@ tbody tr:last-child td{border-bottom:none}
 <!-- ══ TAB 2: RECORDS ══ -->
 <div class="tab-pane" id="tab-records">
   <div class="toolbar">
-    <input type="text" class="srch" id="srch" placeholder="🔍 ค้นหา ชื่อ / หน่วยงาน / คำถาม..." oninput="renderRecords()">
+    <input type="text" class="srch" id="srch" placeholder="🔍 ค้นหา ชื่อ / หน่วยงาน / คำถาม..." oninput="renderRecords()"/>
     <select id="flt-date" onchange="toggleRecDateRange();renderRecords()" style="width:auto">
       <option value="">ทุกวัน</option>
       <option value="today">วันนี้</option>
@@ -381,21 +379,25 @@ tbody tr:last-child td{border-bottom:none}
       <option value="month">เดือนนี้</option>
       <option value="custom">📅 ช่วงวันที่ระบุ</option>
     </select>
-    <select id="flt-svc" onchange="renderRecords()" style="width:auto"><option value="">ทุกประเภทบริการ</option><option value="proc">📦 จัดซื้อจัดจ้าง</option><option value="law">⚖️ กฎหมายระเบียบการเงินการคลัง</option><option value="gfm">💻 GFMIS</option><option value="eco">📈 เศรษฐกิจ</option><option value="pen">🏅 บำเหน็จบำนาญ</option><option value="wel">🤝 งานสวัสดิการแห่งรัฐ</option></select>
-    <select id="flt-ch" onchange="renderRecords()" style="width:auto"><option value="">ทุกช่องทาง</option><option value="walkin">🏢 ติดต่อด้วยตนเอง ณ สำนักงาน</option><option value="line">💚 Line</option><option value="fb">💙 Facebook</option><option value="phone">📞 โทรศัพท์</option><option value="other">✏️ อื่นๆ (ระบุ)</option></select>
+    <select id="flt-svc" onchange="renderRecords()" style="width:auto">
+      <option value="">ทุกประเภทบริการ</option>
+    </select>
+    <select id="flt-ch" onchange="renderRecords()" style="width:auto">
+      <option value="">ทุกช่องทาง</option>
+    </select>
     <select id="flt-officer" onchange="renderRecords()" style="width:auto">
       <option value="">ทุกเจ้าหน้าที่</option>
     </select>
     <button class="btn btn-green" onclick="exportCSV()">📥 Export CSV</button>
-    <button class="btn btn-blue" onclick="window.print()">🖨️ พิมพ์</button>
+    <button class="btn btn-blue"  onclick="window.print()">🖨️ พิมพ์</button>
   </div>
   <!-- ช่วงวันที่ระบุ (แสดงเมื่อเลือก custom) -->
   <div id="rec-date-range" style="display:none;padding:10px 0 4px;display:none;align-items:center;gap:10px;flex-wrap:wrap">
     <label style="font-size:.86rem;font-weight:600;color:var(--gray)">ตั้งแต่วันที่</label>
-    <input type="date" id="rec-from" onchange="renderRecords()" style="width:auto;padding:7px 12px;font-size:.88rem">
+    <input type="date" id="rec-from" onchange="renderRecords()" style="width:auto;padding:7px 12px;font-size:.88rem"/>
     <label style="font-size:.86rem;font-weight:600;color:var(--gray)">ถึงวันที่</label>
-    <input type="date" id="rec-to" onchange="renderRecords()" style="width:auto;padding:7px 12px;font-size:.88rem">
-    <span id="rec-count-lbl" style="font-size:.84rem;color:var(--primary);font-weight:600">พบ 2 รายการ</span>
+    <input type="date" id="rec-to" onchange="renderRecords()" style="width:auto;padding:7px 12px;font-size:.88rem"/>
+    <span id="rec-count-lbl" style="font-size:.84rem;color:var(--primary);font-weight:600"></span>
   </div>
   <div class="tbl-wrap">
     <table>
@@ -405,57 +407,7 @@ tbody tr:last-child td{border-bottom:none}
         <th>ผู้รับบริการ</th><th>หน่วยงาน</th><th>ช่องทาง</th>
         <th>คำถาม</th><th>คำตอบ</th><th>เจ้าหน้าที่</th><th>จัดการ</th>
       </tr></thead>
-      <tbody id="rec-tbody"><tr>
-      <td>2</td>
-      <td style="white-space:nowrap">6 เม.ย. 2569</td>
-      <td>
-        <span class="badge" style="background:#dbeafe;color:#1d4ed8">
-          📦 จก001
-        </span>
-      </td>
-      <td style="white-space:nowrap">15:10</td>
-      <td style="white-space:nowrap">15:31</td>
-      <td style="white-space:nowrap">21 น.</td>
-      <td>หกดฟหก</td>
-      <td class="td-trunc" title="ฟหไกด">ฟหไกด</td>
-      <td>
-        <span class="badge" style="background:#dbeafe;color:#1d4ed8">
-          🏢 ติดต่อด้วยตนเอง ณ สำนักงาน
-        </span>
-      </td>
-      <td class="td-trunc" title="ฟหกด">ฟหกด</td>
-      <td class="td-trunc" title="ฟหกด">ฟหกด</td>
-      <td style="white-space:nowrap">นายณัฏฐ์กิตต์ วิเศษรัตน์</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-blue" style="margin-bottom:4px;font-size:.76rem;padding:5px 10px" onclick="viewRec(&#39;1775464081699&#39;)">ดู</button><br>
-        <button class="btn btn-red" style="font-size:.76rem;padding:5px 10px" onclick="delRec(&#39;1775464081699&#39;)">ลบ</button>
-      </td>
-    </tr><tr>
-      <td>1</td>
-      <td style="white-space:nowrap">6 เม.ย. 2569</td>
-      <td>
-        <span class="badge" style="background:#ccfbf1;color:#0f766e">
-          💻 GG001
-        </span>
-      </td>
-      <td style="white-space:nowrap">10:34</td>
-      <td style="white-space:nowrap">10:39</td>
-      <td style="white-space:nowrap">5 น.</td>
-      <td>asdASDasd</td>
-      <td class="td-trunc" title="ASDasdAS">ASDasdAS</td>
-      <td>
-        <span class="badge" style="background:#dbeafe;color:#1d4ed8">
-          🏢 ติดต่อด้วยตนเอง ณ สำนักงาน
-        </span>
-      </td>
-      <td class="td-trunc" title="asDFasdfas">asDFasdfas</td>
-      <td class="td-trunc" title="asdfasdfasdfasdfasdfasdfasdf">asdfasdfasdfasdfasdfasdfasdf</td>
-      <td style="white-space:nowrap">นายพรพิพัฒน์ เหมคุณ</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-blue" style="margin-bottom:4px;font-size:.76rem;padding:5px 10px" onclick="viewRec(&#39;1775446571325&#39;)">ดู</button><br>
-        <button class="btn btn-red" style="font-size:.76rem;padding:5px 10px" onclick="delRec(&#39;1775446571325&#39;)">ลบ</button>
-      </td>
-    </tr></tbody>
+      <tbody id="rec-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -463,16 +415,16 @@ tbody tr:last-child td{border-bottom:none}
 <!-- ══ TAB 3: REPORT ══ -->
 <div class="tab-pane" id="tab-report">
   <div class="rpt-nav">
-    <button class="rpt-btn active" onclick="setRptType(&#39;daily&#39;,this)">📅 รายวัน</button>
-    <button class="rpt-btn" onclick="setRptType(&#39;weekly&#39;,this)">📆 รายสัปดาห์</button>
-    <button class="rpt-btn" onclick="setRptType(&#39;monthly&#39;,this)">🗓️ รายเดือน</button>
-    <button class="rpt-btn" onclick="setRptType(&#39;custom&#39;,this)">🗂️ ช่วงวันที่ระบุ</button>
+    <button class="rpt-btn active" onclick="setRptType('daily',this)">📅 รายวัน</button>
+    <button class="rpt-btn"        onclick="setRptType('weekly',this)">📆 รายสัปดาห์</button>
+    <button class="rpt-btn"        onclick="setRptType('monthly',this)">🗓️ รายเดือน</button>
+    <button class="rpt-btn"        onclick="setRptType('custom',this)">🗂️ ช่วงวันที่ระบุ</button>
   </div>
 
   <!-- ปุ่มนำทาง (ซ่อนเมื่อเลือก custom) -->
   <div class="period-nav" id="rpt-period-nav">
     <button class="btn btn-blue" onclick="rptNav(-1)">◀ ก่อนหน้า</button>
-    <span class="period-lbl" id="rpt-lbl">📅 6 เม.ย. 2569</span>
+    <span class="period-lbl" id="rpt-lbl">—</span>
     <button class="btn btn-blue" onclick="rptNav(1)">ถัดไป ▶</button>
     <button class="btn btn-gray" onclick="rptToday()">วันนี้/ปัจจุบัน</button>
     <button class="btn btn-green" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
@@ -481,186 +433,31 @@ tbody tr:last-child td{border-bottom:none}
   <!-- ช่วงวันที่ระบุเอง (แสดงเมื่อเลือก custom) -->
   <div id="rpt-custom-range" style="display:none" class="period-nav">
     <label style="font-size:.88rem;font-weight:600">ตั้งแต่วันที่</label>
-    <input type="date" id="rpt-from" onchange="renderReport()" style="width:auto;padding:7px 12px;font-size:.88rem;border:1.5px solid var(--border);border-radius:8px">
+    <input type="date" id="rpt-from" onchange="renderReport()" style="width:auto;padding:7px 12px;font-size:.88rem;border:1.5px solid var(--border);border-radius:8px"/>
     <label style="font-size:.88rem;font-weight:600">ถึงวันที่</label>
-    <input type="date" id="rpt-to" onchange="renderReport()" style="width:auto;padding:7px 12px;font-size:.88rem;border:1.5px solid var(--border);border-radius:8px">
+    <input type="date" id="rpt-to" onchange="renderReport()" style="width:auto;padding:7px 12px;font-size:.88rem;border:1.5px solid var(--border);border-radius:8px"/>
     <button class="btn btn-gray" onclick="setRptCustomToday()">เดือนนี้</button>
     <button class="btn btn-green" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
   </div>
 
-  <div id="rpt-content">
-    <!-- KPI -->
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-val" style="color:#1d4ed8">2</div>
-        <div class="stat-lbl">จำนวนรายการ</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" style="color:#059669">13</div>
-        <div class="stat-lbl">เฉลี่ยต่อครั้ง (นาที)</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" style="color:#b45309">26</div>
-        <div class="stat-lbl">รวมเวลาทั้งหมด (นาที)</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" style="color:#7c3aed">2</div>
-        <div class="stat-lbl">เจ้าหน้าที่ที่ให้บริการ</div>
-      </div>
-    </div>
-
-    <!-- By Service -->
-    <div class="chart-box">
-      <div class="chart-ttl">📦 จำแนกตามประเภทบริการ</div>
-      <div class="bar-row">
-          <div class="bar-lbl">📦 จัดซื้อจัดจ้าง</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:100%;background:#1d4ed8">1</div>
-          </div>
-          <div class="bar-n">1</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">⚖️ กฎหมายระเบียบการเงินการคลัง</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#6d28d9"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">💻 GFMIS</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:100%;background:#0f766e">1</div>
-          </div>
-          <div class="bar-n">1</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">📈 เศรษฐกิจ</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#b45309"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">🏅 บำเหน็จบำนาญ</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#b91c1c"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">🤝 งานสวัสดิการแห่งรัฐ</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#065f46"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div>
-    </div>
-
-    <!-- By Channel -->
-    <div class="chart-box">
-      <div class="chart-ttl">📡 จำแนกตามช่องทางการให้บริการ</div>
-      <div class="bar-row">
-          <div class="bar-lbl">🏢 ติดต่อด้วยตนเอง ณ สำนักงาน</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:100%;background:#1d4ed8">2</div>
-          </div>
-          <div class="bar-n">2</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">💚 Line</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#065f46"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">💙 Facebook</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#5b21b6"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">📞 โทรศัพท์</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#78350f"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">✏️ อื่นๆ (ระบุ)</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#374151"></div>
-          </div>
-          <div class="bar-n">0</div>
-        </div>
-    </div>
-
-    <!-- By Officer -->
-    <div class="chart-box">
-      <div class="chart-ttl">👤 จำแนกตามเจ้าหน้าที่</div>
-      <div class="bar-row">
-          <div class="bar-lbl">👤 นายพรพิพัฒน์ เหมคุณ</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:100%;background:#1d4ed8">1</div>
-          </div>
-          <div class="bar-n">1</div>
-        </div><div class="bar-row">
-          <div class="bar-lbl">👤 นายณัฏฐ์กิตต์ วิเศษรัตน์</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:100%;background:#1d4ed8">1</div>
-          </div>
-          <div class="bar-n">1</div>
-        </div>
-    </div>
-
-    
-
-    <!-- Detail Table -->
-    <div class="chart-box">
-      <div class="chart-ttl">📋 รายการทั้งหมดในช่วงนี้ (2 รายการ)</div>
-      <div class="tbl-wrap">
-            <table>
-              <thead><tr>
-                <th>#</th><th>วันที่</th><th>คิว</th><th>เวลา</th>
-                <th>ระยะเวลา</th><th>ผู้รับบริการ</th><th>หน่วยงาน</th>
-                <th>ช่องทาง</th><th>คำถาม</th><th>เจ้าหน้าที่</th>
-              </tr></thead>
-              <tbody>
-                <tr>
-                    <td>1</td>
-                    <td style="white-space:nowrap">6 เม.ย. 2569</td>
-                    <td><span class="badge" style="background:#ccfbf1;color:#0f766e">💻 GG001</span></td>
-                    <td style="white-space:nowrap;font-size:.8rem">10:34 – 10:39</td>
-                    <td style="white-space:nowrap">5 น.</td>
-                    <td>asdASDasd</td>
-                    <td class="td-trunc">ASDasdAS</td>
-                    <td><span class="badge" style="background:#dbeafe;color:#1d4ed8">🏢 ติดต่อด้วยตนเอง ณ สำนักงาน</span></td>
-                    <td class="td-trunc" title="asDFasdfas">asDFasdfas</td>
-                    <td style="white-space:nowrap">นายพรพิพัฒน์ เหมคุณ</td>
-                  </tr><tr>
-                    <td>2</td>
-                    <td style="white-space:nowrap">6 เม.ย. 2569</td>
-                    <td><span class="badge" style="background:#dbeafe;color:#1d4ed8">📦 จก001</span></td>
-                    <td style="white-space:nowrap;font-size:.8rem">15:10 – 15:31</td>
-                    <td style="white-space:nowrap">21 น.</td>
-                    <td>หกดฟหก</td>
-                    <td class="td-trunc">ฟหไกด</td>
-                    <td><span class="badge" style="background:#dbeafe;color:#1d4ed8">🏢 ติดต่อด้วยตนเอง ณ สำนักงาน</span></td>
-                    <td class="td-trunc" title="ฟหกด">ฟหกด</td>
-                    <td style="white-space:nowrap">นายณัฏฐ์กิตต์ วิเศษรัตน์</td>
-                  </tr>
-              </tbody>
-            </table>
-          </div>
-    </div>
-  </div>
+  <div id="rpt-content"></div>
 </div>
 
 <!-- ══ TAB 4: SETTINGS ══ -->
-<div class="tab-pane active" id="tab-settings">
+<div class="tab-pane" id="tab-settings">
 
   <!-- สถานะ -->
   <div class="set-card">
     <div class="set-ttl">🔄 สถานะการเชื่อมต่อ Cloud</div>
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
-      <span id="sync-badge-settings" class="sync-badge sb-on"><span class="dot dot-g"></span> Cloud (Google Sheets · gviz)</span>
+      <span id="sync-badge-settings" class="sync-badge sb-off">
+        <span class="dot dot-gr"></span> ออฟไลน์ (Local Storage)
+      </span>
     </div>
     <div class="info-box" style="background:#d1fae5;border-color:#6ee7b7;color:#065f46;margin-bottom:0">
-      💡 <strong>หลักการทำงาน:</strong> เมื่อตั้งค่า Google Sheets URL แล้ว<br>
-      • ทุกครั้งที่ <strong>บันทึกข้อมูล</strong> → ส่งขึ้น Cloud ทันที<br>
-      • ทุกครั้งที่ <strong>เปิดแอป</strong> → ดึงข้อมูลจาก Cloud มารวมอัตโนมัติ<br>
+      💡 <strong>หลักการทำงาน:</strong> เมื่อตั้งค่า Google Sheets URL แล้ว<br/>
+      • ทุกครั้งที่ <strong>บันทึกข้อมูล</strong> → ส่งขึ้น Cloud ทันที<br/>
+      • ทุกครั้งที่ <strong>เปิดแอป</strong> → ดึงข้อมูลจาก Cloud มารวมอัตโนมัติ<br/>
       • กดปุ่ม <strong>🔄 Sync</strong> บนแถบด้านบนได้ตลอดเวลา
     </div>
   </div>
@@ -669,11 +466,11 @@ tbody tr:last-child td{border-bottom:none}
   <div class="set-card">
     <div class="set-ttl">☁️ เชื่อมต่อ Google Sheets (ใช้งานร่วมกันออนไลน์)</div>
     <div class="info-box">
-      ✅ ขั้นตอนการตั้งค่าใช้งานร่วมกันออนไลน์<br>
-      1. เปิด <strong>Google Sheets</strong> สร้าง Spreadsheet ใหม่<br>
-      2. เมนู <strong>Extensions → Apps Script</strong> แล้ววางโค้ดด้านล่าง<br>
-      3. กด <strong>Deploy → New Deployment → Web App</strong><br>
-      4. ตั้ง <strong>Execute as:</strong> Me, <strong>Who has access:</strong> Anyone → Deploy<br>
+      ✅ ขั้นตอนการตั้งค่าใช้งานร่วมกันออนไลน์<br/>
+      1. เปิด <strong>Google Sheets</strong> สร้าง Spreadsheet ใหม่<br/>
+      2. เมนู <strong>Extensions → Apps Script</strong> แล้ววางโค้ดด้านล่าง<br/>
+      3. กด <strong>Deploy → New Deployment → Web App</strong><br/>
+      4. ตั้ง <strong>Execute as:</strong> Me, <strong>Who has access:</strong> Anyone → Deploy<br/>
       5. คัดลอก Web App URL วางในช่องด้านล่าง แล้วกดบันทึก
     </div>
     <details style="margin-bottom:14px">
@@ -681,141 +478,30 @@ tbody tr:last-child td{border-bottom:none}
         📋 โค้ด Google Apps Script (คลิกเพื่อดู/คัดลอก)
       </summary>
       <div style="position:relative">
-        <button onclick="copyGasCode()" class="btn btn-gray" style="position:absolute;top:8px;right:8px;font-size:.75rem;padding:5px 12px;z-index:1">
+        <button onclick="copyGasCode()" class="btn btn-gray"
+          style="position:absolute;top:8px;right:8px;font-size:.75rem;padding:5px 12px;z-index:1">
           📋 คัดลอก
         </button>
-        <pre class="code-pre" id="gas-code-pre">// =====================================================
-// Google Apps Script — ระบบบันทึกการให้บริการ
-// สำนักงานคลังจังหวัดอำนาจเจริญ · กรมบัญชีกลาง
-// =====================================================
-// วิธีติดตั้ง:
-//   1. Extensions → Apps Script → วางโค้ดนี้ทั้งหมด
-//   2. Deploy → New Deployment → Web App
-//   3. Execute as: Me
-//   4. Who has access: Anyone
-//   5. กด Deploy → คัดลอก URL ไปใส่ในแอป
-// =====================================================
-
-const SHEET_NAME = 'ServiceLog';
-
-// คอลัมน์ที่เก็บใน Sheet (ต้องตรงกับ field ในแอป)
-const FIELDS = [
-  'id','date','queue','qType','tStart','tEnd','duration',
-  'name','agency','channel','channelOther',
-  'question','answer','officer','ts'
-];
-
-function getOrCreateSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sh = ss.getSheetByName(SHEET_NAME);
-  if (!sh) {
-    sh = ss.insertSheet(SHEET_NAME);
-    // หัวคอลัมน์
-    sh.appendRow(FIELDS);
-    const hdr = sh.getRange(1, 1, 1, FIELDS.length);
-    hdr.setBackground('#1e3a8a')
-       .setFontColor('#ffffff')
-       .setFontWeight('bold')
-       .setFontSize(10);
-    sh.setFrozenRows(1);
-    sh.setColumnWidth(1, 140);  // id
-    sh.setColumnWidth(2, 90);   // date
-    sh.setColumnWidth(11, 160); // question
-    sh.setColumnWidth(12, 200); // answer
-  }
-  return sh;
-}
-
-// ── รับข้อมูลใหม่จากแอป (POST) ──────────────────────
-function doPost(e) {
-  try {
-    const d = JSON.parse(e.postData.contents);
-    if (d.action === 'addRecord') {
-      const sh = getOrCreateSheet();
-
-      // ตรวจสอบว่า ID ซ้ำไหม (ป้องกัน duplicate)
-      const existing = sh.getDataRange().getValues();
-      const ids = existing.slice(1).map(r =&gt; String(r[0]));
-      if (ids.includes(String(d.id))) {
-        return resp({ status:'duplicate', message:'ID already exists' });
-      }
-
-      sh.appendRow(FIELDS.map(f =&gt; d[f] ?? ''));
-    }
-    return resp({ status:'ok' });
-  } catch(err) {
-    return resp({ status:'error', message: err.message });
-  }
-}
-
-// ── ส่งข้อมูลทั้งหมดกลับให้แอป (GET) ─────────────────
-function doGet(e) {
-  const action = e.parameter.action || 'getAll';
-
-  if (action === 'ping') {
-    return resp({ status:'ok', message:'CGD ServiceLog API ready ✅' });
-  }
-
-  if (action === 'getAll') {
-    const sh = getOrCreateSheet();
-    const rows = sh.getDataRange().getValues();
-    if (rows.length &lt;= 1) return resp({ status:'ok', records:[], count:0 });
-
-    const hdrs = rows[0]; // FIELDS array
-    const records = rows.slice(1)
-      .filter(row =&gt; row[0]) // กรองแถวว่าง
-      .map(row =&gt; {
-        const obj = {};
-        hdrs.forEach((h, i) =&gt; {
-          const val = row[i];
-          if(val instanceof Date) {
-            // Google Sheets เก็บ date/time เป็น Date object — ต้องแปลงให้ถูก format
-            if(h === 'date') {
-              obj[h] = Utilities.formatDate(val, 'Asia/Bangkok', 'yyyy-MM-dd');
-            } else if(h === 'tStart' || h === 'tEnd') {
-              obj[h] = Utilities.formatDate(val, 'Asia/Bangkok', 'HH:mm');
-            } else {
-              obj[h] = String(val);
-            }
-          } else if(h === 'duration') {
-            obj[h] = Number(val) || null;
-          } else {
-            obj[h] = String(val ?? '');
-          }
-        });
-        return obj;
-      });
-
-    return resp({ status:'ok', count: records.length, records });
-  }
-
-  return resp({ status:'error', message:'Unknown action' });
-}
-
-function resp(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
-}</pre>
+        <pre class="code-pre" id="gas-code-pre"></pre>
       </div>
     </details>
     <div class="form-group">
       <label>Google Apps Script Web App URL <span style="font-weight:400;color:#6b7280">(สำหรับ <strong>เขียน</strong> ข้อมูลขึ้น Cloud)</span></label>
       <div class="input-row">
-        <input type="url" id="gas-url-in" placeholder="https://script.google.com/macros/s/.../exec">
+        <input type="url" id="gas-url-in" placeholder="https://script.google.com/macros/s/.../exec"/>
         <button class="btn btn-blue" onclick="saveGasUrl()" style="flex-shrink:0">บันทึก URL</button>
-        <button class="btn btn-gray" onclick="testGas()" style="flex-shrink:0">ทดสอบ</button>
+        <button class="btn btn-gray" onclick="testGas()"    style="flex-shrink:0">ทดสอบ</button>
       </div>
     </div>
     <div class="form-group" style="margin-top:14px">
       <label>Google Sheet ID <span style="font-weight:400;color:#6b7280">(สำหรับ <strong>อ่าน/Sync</strong> ข้อมูล — แก้ปัญหา CORS)</span></label>
       <div class="info-box" style="margin-bottom:8px;font-size:.83rem;background:#ede9fe;border-color:#c4b5fd;color:#5b21b6">
-        📌 <strong>วิธีหา Sheet ID:</strong> เปิด Google Sheet แล้วดู URL<br>
-        <code style="background:rgba(0,0,0,.07);padding:2px 6px;border-radius:4px">docs.google.com/spreadsheets/d/<strong>← คัดลอกส่วนนี้ →</strong>/edit</code><br>
+        📌 <strong>วิธีหา Sheet ID:</strong> เปิด Google Sheet แล้วดู URL<br/>
+        <code style="background:rgba(0,0,0,.07);padding:2px 6px;border-radius:4px">docs.google.com/spreadsheets/d/<strong>← คัดลอกส่วนนี้ →</strong>/edit</code><br/>
         จากนั้น <strong>แชร์ Sheet → Share → Anyone with the link → Viewer</strong>
       </div>
       <div class="input-row">
-        <input type="text" id="gas-sheet-id-in" placeholder="เช่น 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
+        <input type="text" id="gas-sheet-id-in" placeholder="เช่น 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"/>
         <button class="btn btn-blue" onclick="saveSheetId()" style="flex-shrink:0">บันทึก ID</button>
       </div>
     </div>
@@ -824,45 +510,10 @@ function resp(obj) {
   <!-- เจ้าหน้าที่ -->
   <div class="set-card">
     <div class="set-ttl">👤 รายชื่อเจ้าหน้าที่</div>
-    <div class="staff-wrap" id="staff-wrap"><span class="tag-pill">👤 นางนิภาพรรณ เหล่าแค
-      <button class="tag-del" onclick="removeStaff(0)">✕</button>
-    </span><span class="tag-pill">👤 นายณัฏฐ์กิตต์ วิเศษรัตน์
-      <button class="tag-del" onclick="removeStaff(1)">✕</button>
-    </span><span class="tag-pill">👤 นายพงศกร แสวงหา
-      <button class="tag-del" onclick="removeStaff(2)">✕</button>
-    </span><span class="tag-pill">👤 นางศุภรัตน์ วรรณโท
-      <button class="tag-del" onclick="removeStaff(3)">✕</button>
-    </span><span class="tag-pill">👤 นายพรพิพัฒน์ เหมคุณ
-      <button class="tag-del" onclick="removeStaff(4)">✕</button>
-    </span><span class="tag-pill">👤 นายพีระยุทธ์ เชื้อสุข
-      <button class="tag-del" onclick="removeStaff(5)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวธีรภัทร์ มาศขาว
-      <button class="tag-del" onclick="removeStaff(6)">✕</button>
-    </span><span class="tag-pill">👤 นายสานิตย์ สารพันธ์
-      <button class="tag-del" onclick="removeStaff(7)">✕</button>
-    </span><span class="tag-pill">👤 นางสาววิไลรัตน์ เวชกามา
-      <button class="tag-del" onclick="removeStaff(8)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวกรภัทร์ สุขโน
-      <button class="tag-del" onclick="removeStaff(9)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวอนุชสรา ช่วยมิตร
-      <button class="tag-del" onclick="removeStaff(10)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวชนิตรา จันทร์สว่าง
-      <button class="tag-del" onclick="removeStaff(11)">✕</button>
-    </span><span class="tag-pill">👤 นายบดินทร์ โพธิมะโน
-      <button class="tag-del" onclick="removeStaff(12)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวอัฐพร คำบุรมย์
-      <button class="tag-del" onclick="removeStaff(13)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวสุภาพร วรรณภูมิ
-      <button class="tag-del" onclick="removeStaff(14)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวรัตนา วารินทร์
-      <button class="tag-del" onclick="removeStaff(15)">✕</button>
-    </span><span class="tag-pill">👤 นางสาวดลยา พันธ์นาม
-      <button class="tag-del" onclick="removeStaff(16)">✕</button>
-    </span><span class="tag-pill">👤 นายภุชงค์ ลครวงษ์
-      <button class="tag-del" onclick="removeStaff(17)">✕</button>
-    </span></div>
+    <div class="staff-wrap" id="staff-wrap"></div>
     <div class="input-row">
-      <input type="text" id="staff-in" placeholder="ชื่อเจ้าหน้าที่ที่ต้องการเพิ่ม" onkeydown="if(event.key===&#39;Enter&#39;){event.preventDefault();addStaff()}">
+      <input type="text" id="staff-in" placeholder="ชื่อเจ้าหน้าที่ที่ต้องการเพิ่ม"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();addStaff()}"/>
       <button class="btn btn-blue" onclick="addStaff()">+ เพิ่ม</button>
     </div>
   </div>
@@ -873,11 +524,11 @@ function resp(obj) {
     <div class="form-grid">
       <div class="form-group">
         <label>ชื่อสำนักงาน</label>
-        <input type="text" id="cfg-office" placeholder="เช่น สำนักงานคลังจังหวัดเชียงใหม่">
+        <input type="text" id="cfg-office" placeholder="เช่น สำนักงานคลังจังหวัดเชียงใหม่"/>
       </div>
       <div class="form-group">
         <label>จังหวัด</label>
-        <input type="text" id="cfg-province" placeholder="เช่น เชียงใหม่">
+        <input type="text" id="cfg-province" placeholder="เช่น เชียงใหม่"/>
       </div>
     </div>
     <button class="btn btn-blue" onclick="saveConfig()" style="margin-top:12px">บันทึกข้อมูล</button>
@@ -892,15 +543,15 @@ function resp(obj) {
     <div class="form-grid">
       <div class="form-group">
         <label>รหัสผ่านปัจจุบัน</label>
-        <input type="password" id="old-pin" placeholder="••••••••">
+        <input type="password" id="old-pin" placeholder="••••••••"/>
       </div>
       <div class="form-group">
         <label>รหัสผ่านใหม่</label>
-        <input type="password" id="new-pin" placeholder="อย่างน้อย 4 ตัวอักษร">
+        <input type="password" id="new-pin" placeholder="อย่างน้อย 4 ตัวอักษร"/>
       </div>
       <div class="form-group">
         <label>ยืนยันรหัสผ่านใหม่</label>
-        <input type="password" id="confirm-pin" placeholder="••••••••">
+        <input type="password" id="confirm-pin" placeholder="••••••••"/>
       </div>
     </div>
     <button class="btn btn-red" onclick="changePin()" style="margin-top:12px">🔑 เปลี่ยนรหัสผ่าน</button>
@@ -919,16 +570,16 @@ function resp(obj) {
     </button>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
       <button class="btn btn-green" onclick="exportCSV()">📥 Export CSV</button>
-      <button class="btn btn-blue" onclick="exportJSON()">📤 Export JSON</button>
-      <button class="btn btn-blue" onclick="document.getElementById(&#39;imp-file&#39;).click()">
+      <button class="btn btn-blue"  onclick="exportJSON()">📤 Export JSON</button>
+      <button class="btn btn-blue"  onclick="document.getElementById('imp-file').click()">
         📥 Import JSON
       </button>
-      <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(event)">
+      <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(event)"/>
       <button class="btn btn-red" onclick="clearAll()">🗑️ ล้างข้อมูลทั้งหมด</button>
     </div>
     <div style="font-size:.84rem;color:#6b7280">
-      ข้อมูลปัจจุบัน: <strong id="total-lbl" style="color:var(--primary)">2</strong> รายการ
-      &nbsp;|&nbsp; เจ้าหน้าที่: <strong id="staff-lbl" style="color:var(--primary)">18</strong> คน
+      ข้อมูลปัจจุบัน: <strong id="total-lbl" style="color:var(--primary)">0</strong> รายการ
+      &nbsp;|&nbsp; เจ้าหน้าที่: <strong id="staff-lbl" style="color:var(--primary)">0</strong> คน
     </div>
   </div>
 
@@ -955,7 +606,9 @@ function resp(obj) {
     </div>
     <div class="form-group" style="margin-bottom:16px">
       <label>รหัสผ่านผู้ดูแล</label>
-      <input type="password" id="admin-pin-input" placeholder="••••••••" onkeydown="if(event.key===&#39;Enter&#39;) checkAdminPin()" style="font-size:1.1rem;letter-spacing:4px;text-align:center">
+      <input type="password" id="admin-pin-input" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') checkAdminPin()"
+        style="font-size:1.1rem;letter-spacing:4px;text-align:center"/>
       <div id="admin-pin-err" style="color:#dc2626;font-size:.82rem;margin-top:6px;display:none">
         ❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่
       </div>
@@ -973,7 +626,7 @@ function resp(obj) {
 </div>
 
 <!-- ══ ข้อควรรู้ก่อนใช้ MODAL ══ -->
-<div class="modal-ov hidden" id="notice-modal">
+<div class="modal-ov" id="notice-modal">
   <div class="modal-box" style="max-width:580px;border-top:6px solid var(--primary-mid)">
     <div style="text-align:center;margin-bottom:18px">
       <div style="font-size:2.6rem;margin-bottom:8px">🏛️</div>
@@ -1008,7 +661,7 @@ function resp(obj) {
     </div>
 
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <input type="checkbox" id="notice-noshowcheck" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary-mid)">
+      <input type="checkbox" id="notice-noshowcheck" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary-mid)"/>
       <label for="notice-noshowcheck" style="font-size:.85rem;cursor:pointer;color:#6b7280">ไม่แสดงอีกในเครื่องนี้</label>
     </div>
 
@@ -1019,7 +672,7 @@ function resp(obj) {
 </div>
 
 <!-- ══ TOAST ══ -->
-<div id="toast" class="">✅ Sync เสร็จสิ้น — ข้อมูลเป็นปัจจุบันแล้ว</div>
+<div id="toast"></div>
 
 <script>
 /* ══════════════════════════════════════════════
@@ -1136,7 +789,6 @@ function updateClock() {
 ══════════════════════════════════════════════ */
 function buildServiceSelect() {
   const sel = document.getElementById('f-qtype');
-  sel.innerHTML = '<option value="">-- ประเภทบริการ --</option>'; // ← เพิ่มบรรทัดนี้
   SERVICES.forEach(s => sel.add(new Option(`${s.icon} ${s.prefix}  –  ${s.name}`, s.id)));
 }
 
@@ -1153,8 +805,9 @@ function pickChannel(id) {
   document.getElementById('f-channel').value = id;
   document.querySelectorAll('.ch-btn').forEach(b =>
     b.classList.toggle('sel', b.dataset.id === id));
+
   // แสดง/ซ่อนช่องระบุอื่นๆ
-  const otherWrap = document.getElementById('ch-other-wrap');
+  const otherWrap  = document.getElementById('ch-other-wrap');
   const otherInput = document.getElementById('f-channel-other');
   if(id === 'other') {
     otherWrap.style.display = 'block';
@@ -1164,6 +817,23 @@ function pickChannel(id) {
     otherWrap.style.display = 'none';
     otherInput.required = false;
     otherInput.value = '';
+  }
+
+  // ช่องหมายเลขคิว — บังคับเฉพาะมารับบริการที่สำนักงาน
+  const qnumInput = document.getElementById('f-qnum');
+  const qnumLabel = document.getElementById('qnum-label');
+  if(id === 'walkin') {
+    qnumInput.disabled    = false;
+    qnumInput.placeholder = 'เช่น 001';
+    qnumInput.style.opacity = '1';
+    // แสดง * บังคับ
+    qnumLabel.innerHTML = 'คิวบริการ (ประเภท + หมายเลข)<span class="req">*</span>';
+  } else {
+    qnumInput.disabled    = false; // ยังกรอกได้ แต่ไม่บังคับ
+    qnumInput.placeholder = 'ไม่มีคิว (ไม่บังคับ)';
+    qnumInput.style.opacity = '0.6';
+    // ไม่แสดง * บังคับ
+    qnumLabel.innerHTML = 'คิวบริการ (ประเภท + หมายเลข) <span style="font-weight:400;color:#6b7280;font-size:.8rem">— ไม่บังคับสำหรับช่องทางนี้</span>';
   }
 }
 
@@ -1226,8 +896,8 @@ function submitForm(e) {
   if(!vDate)    { highlight('f-date');     toast('⚠️ กรุณาระบุวันที่'); return; }
   if(!vTStart)  { highlight('f-tstart');   toast('⚠️ กรุณาระบุเวลาเริ่มต้น'); return; }
   if(!vTEnd)    { highlight('f-tend');     toast('⚠️ กรุณาระบุเวลาสิ้นสุด'); return; }
-  if(!vQType)   { highlight('f-qtype');    toast('⚠️ กรุณาเลือกประเภทคิวบริการ'); return; }
-  if(!vQNum)    { highlight('f-qnum');     toast('⚠️ กรุณาระบุหมายเลขคิว'); return; }
+  if(!vQType)   { highlight('f-qtype');    toast('⚠️ กรุณาเลือกประเภทบริการ'); return; }
+  if(vChannel === 'walkin' && !vQNum) { highlight('f-qnum'); toast('⚠️ กรุณาระบุหมายเลขคิว (มารับบริการที่สำนักงาน)'); return; }
   if(!vName)    { highlight('f-name');     toast('⚠️ กรุณาระบุชื่อผู้รับบริการ'); return; }
   if(!vAgency)  { highlight('f-agency');   toast('⚠️ กรุณาระบุหน่วยงาน หรือ ประชาชน'); return; }
   if(!vOfficer) { highlight('f-officer');  toast('⚠️ กรุณาเลือกเจ้าหน้าที่ผู้ให้บริการ'); return; }
@@ -1489,7 +1159,7 @@ function renderReport() {
   if(rptType !== 'custom') document.getElementById('rpt-lbl').textContent = lbl;
 
   const total   = list.length;
-  const totDur  = list.reduce((s,r)=>s+(r.duration||0), 0);
+  const totDur  = list.reduce((s,r)=>s+(Number(r.duration)||0), 0);
   const avgDur  = total ? Math.round(totDur/total) : 0;
   const officers= [...new Set(list.filter(r=>r.officer).map(r=>r.officer))];
 
@@ -1521,11 +1191,11 @@ function renderReport() {
         <div class="stat-lbl">จำนวนรายการ</div>
       </div>
       <div class="stat-box">
-        <div class="stat-val" style="color:#059669">${avgDur}</div>
+        <div class="stat-val" style="color:#059669">${avgDur.toLocaleString()}</div>
         <div class="stat-lbl">เฉลี่ยต่อครั้ง (นาที)</div>
       </div>
       <div class="stat-box">
-        <div class="stat-val" style="color:#b45309">${totDur}</div>
+        <div class="stat-val" style="color:#b45309">${totDur.toLocaleString()}</div>
         <div class="stat-lbl">รวมเวลาทั้งหมด (นาที)</div>
       </div>
       <div class="stat-box">
@@ -1565,19 +1235,48 @@ function renderReport() {
       }).join('')}
     </div>
 
-    <!-- By Officer -->
+    <!-- By Officer — Donut Pie Chart -->
     <div class="chart-box">
       <div class="chart-ttl">👤 จำแนกตามเจ้าหน้าที่</div>
-      ${Object.entries(byOff).sort((a,b)=>b[1]-a[1]).map(([nm,n])=>{
-        const p=Math.round(n/maxOff*100);
-        return `<div class="bar-row">
-          <div class="bar-lbl">👤 ${esc(nm)}</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:${p}%;background:#1d4ed8">${n>0?n:''}</div>
-          </div>
-          <div class="bar-n">${n}</div>
+      ${(()=>{
+        const offList = Object.entries(byOff).sort((a,b)=>b[1]-a[1]);
+        if(!offList.length) return '<div style="color:#9ca3af;font-size:.84rem">ไม่มีข้อมูล</div>';
+        const PIE_COLORS = ['#1d4ed8','#059669','#b45309','#7c3aed','#be185d','#0891b2',
+          '#dc2626','#d97706','#16a34a','#9333ea','#0284c7','#ea580c'];
+        const cx=110, cy=110, R=80, r=48;
+        let angle = -Math.PI/2;
+        let slices = '';
+        offList.forEach(([nm,n],i)=>{
+          const frac = n/total;
+          const a2   = angle + frac*2*Math.PI;
+          const x1=cx+R*Math.cos(angle), y1=cy+R*Math.sin(angle);
+          const x2=cx+R*Math.cos(a2),   y2=cy+R*Math.sin(a2);
+          const xi1=cx+r*Math.cos(angle),yi1=cy+r*Math.sin(angle);
+          const xi2=cx+r*Math.cos(a2),  yi2=cy+r*Math.sin(a2);
+          const lg = frac>0.5?1:0;
+          const col = PIE_COLORS[i%PIE_COLORS.length];
+          slices += `<path d="M${xi1},${yi1} L${x1},${y1} A${R},${R},0,${lg},1,${x2},${y2} L${xi2},${yi2} A${r},${r},0,${lg},0,${xi1},${yi1}Z"
+            fill="${col}" opacity="0.9" stroke="#fff" stroke-width="2"/>`;
+          angle = a2;
+        });
+        const legend = offList.map(([nm,n],i)=>{
+          const col = PIE_COLORS[i%PIE_COLORS.length];
+          const pct = Math.round(n/total*100);
+          return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+            <span style="width:14px;height:14px;border-radius:3px;background:${col};flex-shrink:0"></span>
+            <span style="font-size:.83rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</span>
+            <span style="font-size:.83rem;font-weight:700;color:#374151">${n} <span style="color:#9ca3af;font-weight:400">(${pct}%)</span></span>
+          </div>`;
+        }).join('');
+        return `<div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <svg width="220" height="220" viewBox="0 0 220 220" style="flex-shrink:0">
+            ${slices}
+            <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="22" font-weight="800" fill="#1e3a8a">${total}</text>
+            <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="11" fill="#6b7280">รายการ</text>
+          </svg>
+          <div style="flex:1;min-width:160px">${legend}</div>
         </div>`;
-      }).join('') || '<div style="color:#9ca3af;font-size:.84rem">ไม่มีข้อมูล</div>'}
+      })()}
     </div>
 
     ${dateRows.length>1?`
@@ -1602,26 +1301,27 @@ function renderReport() {
       ${!list.length
         ? '<div style="color:#9ca3af;text-align:center;padding:20px">ไม่มีข้อมูลในช่วงเวลานี้</div>'
         : `<div class="tbl-wrap">
-            <table>
+            <table style="font-size:.82rem">
               <thead><tr>
                 <th>#</th><th>วันที่</th><th>คิว</th><th>เวลา</th>
-                <th>ระยะเวลา</th><th>ผู้รับบริการ</th><th>หน่วยงาน</th>
-                <th>ช่องทาง</th><th>คำถาม</th><th>เจ้าหน้าที่</th>
+                <th>ระยะ</th><th>ผู้รับบริการ</th><th>หน่วยงาน</th>
+                <th>ช่องทาง</th><th>คำถามที่ขอรับบริการ/ปรึกษา</th>
+                <th>คำตอบ/คำปรึกษา</th><th>เจ้าหน้าที่</th>
               </tr></thead>
               <tbody>
                 ${[...list].sort((a,b)=>a.date.localeCompare(b.date)||(a.tStart||'').localeCompare(b.tStart||'')).map((r,i)=>{
                   const svc=SERVICES.find(s=>s.id===r.qType);
-                  const ch =CHANNELS.find(c=>c.id===r.channel);
                   return `<tr>
                     <td>${i+1}</td>
                     <td style="white-space:nowrap">${dateTH(r.date)}</td>
                     <td><span class="badge" style="background:${svc?.bg||'#f3f4f6'};color:${svc?.color||'#374151'}">${svc?.icon||''} ${esc(r.queue)||'—'}</span></td>
                     <td style="white-space:nowrap;font-size:.8rem">${r.tStart||''}${r.tEnd?' – '+r.tEnd:''}</td>
                     <td style="white-space:nowrap">${r.duration!=null?r.duration+' น.':'—'}</td>
-                    <td>${esc(r.name)}</td>
-                    <td class="td-trunc">${esc(r.agency)||'—'}</td>
-                    <td><span class="badge" style="background:${CH_COLOR[r.channel]||'#f3f4f6'};color:${CH_TXTCL[r.channel]||'#374151'}">${chDisplay(r)}</span></td>
-                    <td class="td-trunc" title="${esc(r.question)}">${esc(r.question)}</td>
+                    <td style="min-width:90px">${esc(r.name)}</td>
+                    <td style="min-width:90px">${esc(r.agency)||'—'}</td>
+                    <td style="white-space:nowrap"><span class="badge" style="background:${CH_COLOR[r.channel]||'#f3f4f6'};color:${CH_TXTCL[r.channel]||'#374151'}">${chDisplay(r)}</span></td>
+                    <td style="min-width:160px;white-space:pre-wrap;word-break:break-word">${esc(r.question)||'—'}</td>
+                    <td style="min-width:160px;white-space:pre-wrap;word-break:break-word">${esc(r.answer)||'—'}</td>
                     <td style="white-space:nowrap">${esc(r.officer)}</td>
                   </tr>`;
                 }).join('')}
@@ -1794,43 +1494,33 @@ async function testGas() {
 async function postGas(rec) {
   if(!gasUrl) return;
   try {
-    const form = new FormData();
-    form.append('data', JSON.stringify({action:'addRecord', ...rec}));
     await fetch(gasUrl, {
-      method:'POST',
-      mode:'no-cors',
-      body: form,
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'addRecord', ...rec}),
     });
   } catch(err) { console.warn('GAS post error:', err); }
 }
 
 /* แปลงค่า gviz cell — จัดการ Date(year,month,day,...) ที่ Google Sheets ส่งมา */
 function parseGvizCell(col, cell) {
-  if (!cell || cell.v === null || cell.v === undefined) return '';
+  if(!cell || cell.v === null || cell.v === undefined) return '';
   const v = cell.v;
-
-  if (typeof v === 'string' && v.startsWith('Date(')) {
-    const p = v.slice(5, -1).split(',').map(Number);
-    const year = p[0], month = p[1], day = p[2];
-    const hour = p[3] || 0, min = p[4] || 0;
-
-    // ถ้าปี 1899 = เป็นแค่ "เวลา" ไม่มีวันที่ → ดึงแค่ HH:MM
-    if (col === 'date') {
-      if (year <= 1899) return ''; // วันที่ว่าง
-      const mm = String(month + 1).padStart(2, '0');
-      const dd = String(day).padStart(2, '0');
-      return `${year}-${mm}-${dd}`;
+  // gviz ส่ง date/time เป็น "Date(year,month0,day,hour,min,sec)"
+  if(typeof v === 'string' && v.startsWith('Date(')) {
+    const p = v.slice(5,-1).split(',').map(Number);
+    if(col === 'date') {
+      const mm = String(p[1]+1).padStart(2,'0');
+      const dd = String(p[2]).padStart(2,'0');
+      return `${p[0]}-${mm}-${dd}`;
     }
-
-    if (col === 'tStart' || col === 'tEnd') {
-      const hh = String(hour).padStart(2, '0');
-      const mn = String(min).padStart(2, '0');
+    if(col === 'tStart' || col === 'tEnd') {
+      const hh = String(p[3]||0).padStart(2,'0');
+      const mn = String(p[4]||0).padStart(2,'0');
       return `${hh}:${mn}`;
     }
-
     return cell.f || String(v);
   }
-
   return String(v);
 }
 
@@ -2351,6 +2041,5 @@ setInterval(updateAutoSyncLabel, 1000);
 // เริ่ม auto-sync
 startAutoSync();
 </script>
-
-
-</body></html>
+</body>
+</html>
