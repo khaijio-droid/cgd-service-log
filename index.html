@@ -1136,6 +1136,7 @@ function updateClock() {
 ══════════════════════════════════════════════ */
 function buildServiceSelect() {
   const sel = document.getElementById('f-qtype');
+  sel.innerHTML = '<option value="">-- ประเภทบริการ --</option>'; // ← เพิ่มบรรทัดนี้
   SERVICES.forEach(s => sel.add(new Option(`${s.icon} ${s.prefix}  –  ${s.name}`, s.id)));
 }
 
