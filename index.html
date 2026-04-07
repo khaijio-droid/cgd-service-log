@@ -1803,23 +1803,31 @@ async function postGas(rec) {
 
 /* แปลงค่า gviz cell — จัดการ Date(year,month,day,...) ที่ Google Sheets ส่งมา */
 function parseGvizCell(col, cell) {
-  if(!cell || cell.v === null || cell.v === undefined) return '';
+  if (!cell || cell.v === null || cell.v === undefined) return '';
   const v = cell.v;
-  // gviz ส่ง date/time เป็น "Date(year,month0,day,hour,min,sec)"
-  if(typeof v === 'string' && v.startsWith('Date(')) {
-    const p = v.slice(5,-1).split(',').map(Number);
-    if(col === 'date') {
-      const mm = String(p[1]+1).padStart(2,'0');
-      const dd = String(p[2]).padStart(2,'0');
-      return `${p[0]}-${mm}-${dd}`;
+
+  if (typeof v === 'string' && v.startsWith('Date(')) {
+    const p = v.slice(5, -1).split(',').map(Number);
+    const year = p[0], month = p[1], day = p[2];
+    const hour = p[3] || 0, min = p[4] || 0;
+
+    // ถ้าปี 1899 = เป็นแค่ "เวลา" ไม่มีวันที่ → ดึงแค่ HH:MM
+    if (col === 'date') {
+      if (year <= 1899) return ''; // วันที่ว่าง
+      const mm = String(month + 1).padStart(2, '0');
+      const dd = String(day).padStart(2, '0');
+      return `${year}-${mm}-${dd}`;
     }
-    if(col === 'tStart' || col === 'tEnd') {
-      const hh = String(p[3]||0).padStart(2,'0');
-      const mn = String(p[4]||0).padStart(2,'0');
+
+    if (col === 'tStart' || col === 'tEnd') {
+      const hh = String(hour).padStart(2, '0');
+      const mn = String(min).padStart(2, '0');
       return `${hh}:${mn}`;
     }
+
     return cell.f || String(v);
   }
+
   return String(v);
 }
 
